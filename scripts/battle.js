@@ -215,24 +215,26 @@ Mon.prototype.resetTemporary = function() {
             duration : 0,
             move : '(No Move)'
         },
+        roosting : false,
         aqua_ring : false,
         ingrain : false,
-        taunt : 0,
-        encore : 0,
+        leechseed : -1, //  slot
+        taunt : 0,      //  counter
+        encore : 0,     //  counter
         disable : {
             duration : 0,
             slot : -1
         }
-        magnet_rise : 0,
-        telekinesis : 0,
-        yawn : 0,
-        gravity : 0,
-        uproar : 0,
-        confused : 0,
+        magnet_rise : 0,//  counter
+        telekinesis : 0,//  counter
+        yawn : 0,       //  counter
+        gravity : 0,    //  counter
+        uproar : 0,     //  counter
+        confused : 0,   //  counter
         attraction : {
-            target : 0
+            target : -1 //  slot
         },
-        slow_start : 0,
+        slow_start : 0, //  counter
         roosting : false,
         nightmare : false
     };
@@ -519,7 +521,17 @@ var wishEnd = function() {
             Field.wish[i].counter--;
         }
     }
-}
+};
+
+
+
+var roostEnd = function() {
+    //  Order is arbitrary because it doesn't matter
+    for (var i = 0; i < mons_by_speed.length; i++) {
+        //  Just deactivate roost
+        mons_by_speed.roost = false;
+    }
+};
 
 var endOfTurn = function() {
     //  Weather ends
@@ -535,44 +547,83 @@ var endOfTurn = function() {
     wishEnd();
     
     //  Fire/Grass Pledge Damage
+
     //  Shed Skin, Hydration, Healer
+
     //  Leftovers, Black Sludge
+
     //  Aqua Ring
+
     //  Ingrain
+
     //  Leech Seed
+
     //  Poison, Burn, Poison Heal
+
     //  Nightmare
+
     //  Ghost Curse
+
     //  Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
+
     //  Taunt
+
     //  Encore
+
     //  Disable, Cursed Body
+
     //  Magnet Rise
+
     //  Telekinesis
+
     //  Heal Block
+
     //  Embargo
+
     //  Yawn
+
     //  Perish Song
+
     //  Reflect
+
     //  Light Screen
+
     //  Safeguard
+
     //  Mist
+
     //  Tailwind
+
     //  Lucky Chant
+
     //  Pledges
+
     //  Gravity
+
     //  Trick Room
+
     //  Wonder Room
+
     //  Magic Room
+
     //  Uproar
+
     //  Speed Boost, Bad Dreams, Harvest, Moody
+
     //  Orb Activation, Sticky barb
+
     //  Zen Mode
+
     //  Pokemon switched in upon faint
+
     //  Healing Wish, Lunar Dance
+
     //  Spikes, Toxic Spikes, Stealth Rock (hurt in order applied)
+
     //  Slow Start
+
     //  Roost returns
+    roostEnd();
 }
 
 var loop = function () {
