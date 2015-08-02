@@ -566,6 +566,7 @@ var teampreview = function () {
 
 
 //  SEND OUT MON:
+    //  player picks mon
     //  mon.ability.onSendOut()
     //  mon.item.onSendOut()
     //  entry hazards

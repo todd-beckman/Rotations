@@ -41,5 +41,9 @@ Move : {
 
 
 Field : {
+    weather : {
+        type : String,
+        duration : int
+    }
     gravity : int
 }
