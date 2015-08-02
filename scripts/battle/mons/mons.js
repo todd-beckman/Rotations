@@ -1,17 +1,77 @@
-function Pokemon(mon, item, ability, nature, ivs, evs, moves){
+function Pokemon(mon, nick, item, ability, nature, ivs, evs, moves){
+    //  Load the mon
+    this.nick = nick;
     if (Mon[mon] === undefined) {
-        game.e("Illegal Pokemon ");
+        game.e("Illegal Pokemon " + mon);
+        return;
     }
-    this.mon = mon;   //  because 'id' was taken
+    this.mon = mon;
+    //  Load the item
+    if (Item[item] === undefined) {
+        game.e("Illegal Item: " + item);
+        return;
+    }
     this.item = Item[item];
-    this.ability = Ability[ability];
-    while (moves.length < 4) {
-        moves.push(Move["No Move"]);
+    //  Load the nature
+    if (Nature[nature] === undefined) {
+        game.e("Illegal Nature: " + nature);
+        return;
     }
-    this.moves = [Move[moves[0]], Move[moves[1]], Move[moves[2]], Move[moves[3]]];
+    this.nature = Nature[nature];
+    //  Check legal ivs and evs
+    var sum = 0;
+    for (var i = 0; i < 6; i++) {
+        //  EVs must be in range [0, 252];
+        if (252 < evs[i] || evs[i] < 0) {
+            game.e("Illegal EV spread: " + evs.join(", "));
+            return;
+        }
+        sum += evs[i];
+        //  IVs must be in range [0, 31];
+        if (31 < ivs[i] || ivs[i] < -1) {
+            game.e("Illegal IV spread: " + ivs.join(", "));
+            return;
+        }
+    }
+    //  Too many EVs
+    if (510 < sum) {
+        game.e("Illegal EV spread: " + evs.join(", "));
+        return;
+    }
+    //  Save stats in case of form change
+    this.evs = evs;
+    this.ivs = ivs;
+    //  Load things having to do with form
+    this.loadTrivial();
+    //  These will only be defaulted at battle start
+    //  Don't put these in the reset function
+    this.Status = Status.Healthy;
+    this.sleep = 0;
+    this.hpleft = this.basestats[0];    
+    //  These will be defaulted on switch
+    this.loadDefaults();
+}
+Pokemon.prototype.loadTrivial = function () {
+    //  Load the ability
+    if (Ability[ability] === undefined) {
+        game.e("Illegal Ability: " + ability);
+        return;
+    }
+    this.ability = Ability[ability];
+    //  Load the moves
+    this.moves = [];
+    for (var i = 0; i < 4; i++) {
+        if (Move[moves[i]] == undefined) {
+            moves.push(Move["No Move"]);
+        }
+        else {
+            this.moves.push(Move[moves[i]]);
+        }
+    }
+    //  Load the types
     this.type1 = Type[Mon[mon].type1];
     this.type2 = Type[Mon[mon].type2];
-    //  Calculate stats. Nature, ivs, and evs can be dropped afterward
+    //  Calculate stats
     var basestats = Mon[mon].basestats;
     //  Shedinja's base HP is always 1
     if (basestats[0] == 1) {
@@ -19,30 +79,27 @@ function Pokemon(mon, item, ability, nature, ivs, evs, moves){
     }
     else {
         //  HP calc is different from the others
-        this.stats = [Math.floor((ivs[0] + (2 * basestats[0]) + (evs[0] / 4) + 100) * level / 100 + 10)];
+        this.stats = [Math.floor((this.ivs[0] + (2 * basestats[0]) + (this.evs[0] / 4) + 100) * this.level / 100 + 10)];
     }
     //  calc the others stats
     for (var i = 1; i < 6; i++) {
-        this.stats.push(Math.floor((ivs[i] + (2 * basestats[i]) + (evs[i] / 4) ) * level / 100 + 5));
+        this.stats.push(Math.floor((this.ivs[i] + (2 * basestats[i]) + (this.evs[i] / 4) ) * this.level / 100 + 5));
     }
     //  Apply nature modifiers
-    var boosted = Nature[nature][0], dropped = Nature[nature][1];
+    var boosted = Nature[this.nature][0], dropped = Nature[this.nature][1];
     if (boosted != dropped) {
-        stats[Nature[nature][0]] *= 1.1;
-        stats[Nature[nature][1]] *= 0.9;
+        this.stats[boosted] *= 1.1;
+        this.stats[dropped] *= 0.9;
     }
-    //  These will only be defaulted at battle start
-    //  Don't put these in the reset function
-    this.status = "Healthy";
-    this.sleepcounter = 0;
-    this.hpleft = this.basestats[0];    
-    //  These will be defaulted on switch
-    this.reset();
 }
-Pokemon.prototype.reset = function() {
+Pokemon.prototype.changeForm = function (mon){
+    this.mon = mon;
+    this.loadTrivial();
+}
+Pokemon.prototype.loadDefaults = function() {
     //  Stage-based stat boosts/drops
     this.boosts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    this.toxiccounter = 0;
+    this.toxic = 0;
     //  Pseudo-stats Conditions
     this.confused = false;
     this.confusecounter = 0;
@@ -58,24 +115,24 @@ Pokemon.prototype.reset = function() {
     this.bouncing = false;
     this.phantom = false;
     this.skydropping = false;
-    //  Moveset Restriction
+    //  Choice Restriction
+    this.flinching = false;
     this.choicelock = false;
-    this.lastMove = "(No Move)";
+    this.lastMove = "No Move";
     this.disable = {duration : 0, move : -1};
     this.encore = {duration : 0, move : -1};
+    this.charging = false;
     //  Others
     this.hasMoved = false;
     this.helpinghand = false;
     this.protect = false;
     this.protecting = false;
-    this.flinching = false;
     this.leechseed = false;
     this.kingshield = false;
     this.rage = 0;
-    this.charging = false;
     this.magic = false;
     this.minimize = false;
-    this.bind = {duration : 0, move : "(No Move)"};
+    this.bind = {duration : 0, move : "No Move"};
 }
 
 
@@ -125,7 +182,7 @@ Pokemon.prototype.onTouched = function(user, move) {
 //  Called when the mon acquires a status condition
 Pokemon.prototype.onGetStatus = function(status) {
     //  Already has status; cannot status again
-    if (this.status != "Healthy") {
+    if (this.Status != Status.Healthy) {
         return;
     }
     //  Some abilities prevent status
@@ -139,28 +196,28 @@ Pokemon.prototype.onGetStatus = function(status) {
     else {
         switch (status) {
             //  Only burn non-fire mons
-            case "Burn":
-                if (this.type1 != "Fire" && this.type2 != "Fire") {
+            case Status.Burn:
+                if (this.type1 != Type.Fire && this.type2 != Type.Fire) {
                     this.afterGetStatus(status);
                 }
                 break;
             //  Only para non-ele mons
-            case "Paralysis":
-                if (this.type1 != "Electric" && this.type2 != "Electric") {
+            case Status.Paralyze:
+                if (this.type1 != Type.Electric && this.type2 != Type.Electric) {
                     this.afterGetStatus(status);
                 }
                 break;
             //  Only freeze non-ice mons
-            case "Freeze":
-                if (this.type1 != "Ice" && this.type2 != "Ice") {
+            case Status.Freeze:
+                if (this.type1 != Type.Ice && this.type2 != Type.Ice) {
                     this.afterGetStatus(status);
                 }
                 break;
             //  Poison and Steel are both immune
-            case "Poison":
-            case "Badly Poison":
-                if (this.type1 != "Steel" && this.type1 != "Poison"
-                &&  this.type2 != "Steel" && this.type2 != "Poison") {
+            case Status.Poison:
+            case Status.BadlyPoison:
+                if (this.type1 != Type.Steel && this.type1 != Type.Poison
+                &&  this.type2 != Type.Steel && this.type2 != Type.Poison) {
                     this.afterGetStatus(status);
                 }
                 break;
@@ -169,7 +226,7 @@ Pokemon.prototype.onGetStatus = function(status) {
 };
 //  Called when the status condition is successfully inflicted on the mon
 Pokemon.prototype.afterGetStatus = function (status) {
-    this.status = status;
+    this.Status = status;
     this.statuscounter = 1;
     this.ability.afterGetStatus(status);
     this.item.afterGetStatus(status);
@@ -189,23 +246,23 @@ Pokemon.prototype.onTakePoisonDamage = function () {
 //  Called when the mon takes bad poison damage
 Pokemon.prototype.onTakeBadPoisonDamage = function () {
     if (this.ability.onTakeBadPoisonDamage() && this.item.onTakeBadPoisonDamage()) {
-        this.hurt(this.toxic * this.hp / 16);
-        this.statuscounter++;
+        this.hurt(this.toxic++ * this.hp / 16);
     }
 }
 Pokemon.prototype.onCureStatus = function () {
+    this.Status = Status.Healthy;s
     this.ability.onCureStatus();
     this.item.onCureStatus();
 }
-//  Called when a user attempts a status move affected by Magic
+//  Called when a user attempts a status move affected by Magic on this mon
 //  Return true for success and false to trigger failure
 Pokemon.prototype.onMagicMove = function(user, move) {
     //  Either this mon has Magic or its ability triggers it
-    if (this.magic || !ability.onMagicMove(user, move) || !item.onMagicMove(user, move)) {
-        //  TODO: Redirection
-        return false;
-    }
-    else return true;
+    return !this.magic
+        && ability.onMagicMove(user, move) && item.onMagicMove(user, move);
+}
+Pokemon.prototype.onStatChange = function (stat, change, source) {
+    //  TODO
 }
 onGetStatus : function(status),
 onMultiHit : function(),

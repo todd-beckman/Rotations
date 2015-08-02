@@ -1,8 +1,25 @@
 var field = {
+    //  Turn count
+    turn : 0,
+    //  The list of teams; init() fills this
+    teams : [],
+    //  Weather conditions
     weather : {
-        type : "None",
+        type : 0,
         duration : 0
-    }
+    },
+    //  Terrain conditions
+    terrain : {
+        type : 0,
+        duration : 0
+    },
+    //  Room conditions
+    trickroom : 0,
+    magicroom : 0,
+    wonderroom : 0,
+    //  Trap conditions
+    arenatrap : false,
+    shadowtag : false;
 }
 
 var updateFieldGUI = function() {

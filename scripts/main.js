@@ -5,8 +5,8 @@ var init = function() {
 
 
     for (var x = 0; x < game.numteams; x++) {
-        game.team.push(new Team(teamnames[x], x));
-        game.team[x].updateGUI(x);
+        game.teams.push(new Team(teamnames[x], x));
+        game.teams[x].updateGUI(x);
     }
 
     updateFieldGUI();

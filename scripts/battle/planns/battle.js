@@ -565,6 +565,12 @@ var teampreview = function () {
 
 
 
+
+
+//  TEAM PREVIEW:
+    //  choose mons
+    //  SEND OUT MON for each team
+
 //  SEND OUT MON:
     //  player picks mon
     //  mon.ability.onSendOut()
@@ -572,10 +578,6 @@ var teampreview = function () {
     //  entry hazards
     //  return
 
-
-//  TEAM PREVIEW:
-    //  choose mons
-    //  SEND OUT MON for each team
 
 //  order mons by speed
 

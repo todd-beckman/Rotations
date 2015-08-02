@@ -1,22 +1,10 @@
-//  BITWISE FLAGS
-
-var
-    MOVE_USES_CONTACT =          1,  //  0000000000000001
-    MOVE_AFFECTED_BY_KINGSROCK = 2,  //  0000000000000010
-    MOVE_AFFECTED_BY_PROTECT =   4,  //  0000000000000100
-    MOVE_AFFECTED_BY_MAGICCOAT = 8,  //  0000000000001000
-    MOVE_AFFECTED_BY_SNATCH =   16,  //  0000000000010000
-    MOVE_USES_PHYSICAL_ATTACK = 32,  //  0000000000100000
-    MOVE_HITS_PHYSICAL_DEFENSE =64,  //  0000000001000000
-    MOVE_TARGETS_SELF =        128,  //  0000000010000000
-    MOVE_TARGETS_FOE =         256,  //  0000000100000000
-    MOVE_TARGETS_FOES =        512,  //  0000001000000000
-    MOVE_TARGETS_PARTNER =    1024,  //  0000010000000000
-    MOVE_TARGETS_FIELD =      2048,  //  0000100000000000
-    MOVE_TARGETS_FOE_TEAM =   4098,  //  0001000000000000
-    MOVE_TARGETS_TEAM =       8192;  //  0010000000000000
-
 //  ENUMERATIONS
+var Options = {
+    Fight : 0,
+    Switch : 1,
+    Rampage : 2,
+    Recharge : 3
+}
 var GameMode = {
     Singles : 0,
     Doubles : 1,
@@ -33,9 +21,9 @@ var Weather = {
 };
 var Terrain = {
     None : 0
-    Misty Terrain : 1,
-    Electric Terrain : 2,
-    Grassy Terrain : 3
+    Misty : 1,
+    Electric : 2,
+    Grassy : 3
 };
 var Stat = {
     HP : 0,
@@ -58,7 +46,7 @@ var Status = {
     Sleep : 6,
     Faint : 7
 };
-//  Nature: [Increased Stat, Decreased Stat]
+//  Nature: [Raised Stat, Dropped Stat]
 var Nature = {
     Hardy :   [1, 1],
     Bold :    [2, 1],
