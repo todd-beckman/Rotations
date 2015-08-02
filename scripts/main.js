@@ -13,5 +13,5 @@ var init = function() {
 
     console.clear();
     game.gameon = true;
-    game.print("Game loaded!");
+    game.write("Game loaded!");
 }
