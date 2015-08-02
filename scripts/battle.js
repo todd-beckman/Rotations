@@ -534,95 +534,11 @@ var roostEnd = function() {
 };
 
 var endOfTurn = function() {
-    //  Weather ends
     endWeather();
-
-    //  Sandstorm, Hail, Rain Dish, Dry Skin, Ice Body
     weatherEffects();
-
-    //  Future Sight, Doom Desire
     futureSightEnd();
-
-    //  Wish
     wishEnd();
-    
-    //  Fire/Grass Pledge Damage
-
-    //  Shed Skin, Hydration, Healer
-
-    //  Leftovers, Black Sludge
-
-    //  Aqua Ring
-
-    //  Ingrain
-
-    //  Leech Seed
-
-    //  Poison, Burn, Poison Heal
-
-    //  Nightmare
-
-    //  Ghost Curse
-
-    //  Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
-
-    //  Taunt
-
-    //  Encore
-
-    //  Disable, Cursed Body
-
-    //  Magnet Rise
-
-    //  Telekinesis
-
-    //  Heal Block
-
-    //  Embargo
-
-    //  Yawn
-
-    //  Perish Song
-
-    //  Reflect
-
-    //  Light Screen
-
-    //  Safeguard
-
-    //  Mist
-
-    //  Tailwind
-
-    //  Lucky Chant
-
-    //  Pledges
-
-    //  Gravity
-
-    //  Trick Room
-
-    //  Wonder Room
-
-    //  Magic Room
-
-    //  Uproar
-
-    //  Speed Boost, Bad Dreams, Harvest, Moody
-
-    //  Orb Activation, Sticky barb
-
-    //  Zen Mode
-
-    //  Pokemon switched in upon faint
-
-    //  Healing Wish, Lunar Dance
-
-    //  Spikes, Toxic Spikes, Stealth Rock (hurt in order applied)
-
-    //  Slow Start
-
-    //  Roost returns
+//  stuff
     roostEnd();
 }
 
@@ -645,3 +561,151 @@ var teampreview = function () {
     start();
 }
 
+
+
+
+
+//  SEND OUT MON:
+    //  mon.ability.onSendOut()
+    //  mon.item.onSendOut()
+    //  entry hazards
+    //  return
+
+
+//  TEAM PREVIEW:
+    //  choose mons
+    //  SEND OUT MON for each team
+
+//  order mons by speed
+
+//  MAIN LOOP:
+
+//  PLAYER DECISION:
+    //  Cannot decide
+        //  test for recharge
+        //  test for rampage
+    //  Cannot switch
+        //  test if enough mons to switch
+        //  test for switch trap
+    //  Limit move choice:
+        //  test for enough PP
+        //  test for Choice lock
+        //  test for Encore
+        //  test for Disable
+        //  test for Taunt
+        //  test for Imprison
+        //  test for Torment
+        //  test for Struggle
+
+//  order mons by priority and speed
+
+//  ROTATE:
+    //  Clean rotate-dependent status
+    //  Rotate field slots
+
+//  MEGA EVOLUTION:
+    //  Change form
+    //  mon.ability.onSendOut()
+
+//  MOVE: section
+
+    //  switch
+        //  test for trap
+        //  move.onFoeSwitch
+        //  SEND OUT MON
+    //  test for indecision
+        //  test if flinching
+        //  test if sky drop trap
+        //  test if asleep
+        //  test if frozen
+        //  test if confused
+        //  test if paralyzed
+        //  test if attracted
+    //  test for encore override
+    //  move.onPrepare
+        //  test if waiting turn of move
+        //  determine hit count
+    //  commit to move
+        //  pp deduction
+    //  test for protect
+        //  test for protect/detect
+        //  test for quick guard
+        //  test for wide guard
+        //  move.onFail
+    //  test for failed conditions
+        //  test for taunt
+        //  ability overrides
+        //  type mismatches
+        //  move.onFail
+    //  test for accuracy
+        //  move.onFail
+    //  test for temporary stat modifiers
+    //  loop number of hits
+        //  calculate damage
+        //  deal damage
+            //  test item override
+            //  test ability override
+            //  user.onDealDamage
+            //  foe.onTakeDamage
+        //  test for contact
+            //  user.onTouch
+            //  foe.onTouched
+        //  test for user faint
+            //  user.onFaint
+        //  test for foe faint
+            //  foe.onFaint
+    //  test for multihit
+        //  display hit count
+    //  test for recoil
+        //  move.onFinish
+        //  user.onFinishMove
+//  END OF TURN section
+    //  Weather ends
+    //  Sandstorm, Hail, Rain Dish, Dry Skin, Ice Body
+    //  Future Sight, Doom Desire
+    //  Wish
+    //  Fire/Grass Pledge Damage
+    //  Shed Skin, Hydration, Healer
+    //  Leftovers, Black Sludge
+    //  Aqua Ring
+    //  Ingrain
+    //  Leech Seed
+    //  Poison, Burn, Poison Heal
+    //  Nightmare
+    //  Ghost Curse
+    //  Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
+    //  Taunt
+    //  Encore
+    //  Disable, Cursed Body
+    //  Magnet Rise
+    //  Telekinesis
+    //  Heal Block
+    //  Embargo
+    //  Yawn
+    //  Perish Song
+    //  Reflect
+    //  Light Screen
+    //  Safeguard
+    //  Mist
+    //  Tailwind
+    //  Lucky Chant
+    //  Pledges
+    //  Gravity
+    //  Trick Room
+    //  Wonder Room
+    //  Magic Room
+    //  Uproar
+    //  Speed Boost, Bad Dreams, Harvest, Moody
+    //  Orb Activation, Sticky barb
+    //  Zen Mode
+    //  Pokemon switched in upon faint
+    //  Healing Wish, Lunar Dance
+    //  Spikes, Toxic Spikes, Stealth Rock (hurt in order applied)
+    //  Slow Start
+    //  Roost returns
+//  FAINT LOOP
+    //  request mons to open spots
+    //  SEND OUT MON
+    //  if mon faints to hazards, repeat FAINT
+
+//  order mons by speed
