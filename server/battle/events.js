@@ -131,27 +131,262 @@ case Options.Switch:
         //  move.onFinish
         //  user.onFinishMove
 //  END OF TURN section
-    //  Weather ends
-    //  Sandstorm, Hail, Rain Dish, Dry Skin, Ice Body
-    //  Future Sight, Doom Desire
-    //  Wish
-    //  Fire/Grass Pledge Damage
-    //  Shed Skin, Hydration, Healer
-    //  Leftovers, Black Sludge
-    //  Aqua Ring
-    //  Ingrain
-    //  Leech Seed
-    //  Poison, Burn, Poison Heal
 
-    //  Nightmare
-    //  Ghost Curse
+//  Weather ends
+game.loopevents.push(function() {
+    if (field.weather.type != Weather.None) {
+        if (--field.weather.duration) {
+            //  weather ends
+        }
+    }
+});
+    //  Sandstorm, Hail, Rain Dish, Dry Skin, Ice Body
+
+//  Slot-based, countdown moves
+//  Future Sight, Doom Desire
+//  Wish
+game.loopevents.push(function() {
+    //  TODO
+});
+
+//  Fire/Grass Pledge Damage
+game.loopevents.push(function() {
+    for (var i = 0; i < field.teams.length; i++) {
+        var team = field.teams[i];
+        if (team.firegrasspledge) {
+            //  TODO
+        }
+    }
+});
+
+//  Status-restoring Abilities
+//  Shed Skin, Hydration, Healer
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        mon = monsBySpeed[i];
+        switch (mon.ability) {
+        case Ability["Shed Skin"]:
+            if (mon.Status != Status.Healthy) {
+                if (game.rand(10) < 3) {
+                    game.write(mon.nick + "'s Shed Skin cures its status.");
+                    mon.Status = Status.Healthy;
+                }
+            }
+            break;
+        case Ability["Hydration"]:
+            if (mon.status != Status.Healthy) {
+                if (field.weather.type == Weather.Rain) {
+                    game.write(mon.nick + "'s Hydration cures its status.");
+                    mon.Status = Status.Healthy;
+                }
+            }
+            break;
+        case Ability["Healer"]:
+            //  TODO
+            break;
+        }
+    }
+});
+
+//  Item recovery
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        mon = monsBySpeed[i];
+        if (mon.item == Item["Leftovers"]) {
+            if (mon.healblock) {
+                game.write(mon.nick + " was prevented from healing by Heal Block.");
+            }
+            else {
+                game.write(mon.nick + "'s health is restored with Leftovers.");
+                mon.heal(mon.hp / 16);
+            }
+        }
+        else if (mon.item == Item["Black Sludge"]) {
+            if (mon.healblock) {
+                game.write(mon.nick + " was prevented from healing by Heal Block.");
+            }
+            else {
+                game.write(mon.nick + "'s health is restored with Leftovers.");
+                mon.heal(mon.hp / 16);
+            }
+        }
+    }
+});
+
+//  Move recovery
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        mon = monsBySpeed[i];
+        if (mon.aquaring) {
+            if (mon.healblock) {
+                game.write(mon.nick + " was prevented from healing by Heal Block.");
+            }
+            else {
+                game.write(mon.nick + " restorse health with its Aqua Ring.");
+                var health = mon.hp / 16;
+                if (mon.item == Item["Big Root"]) {
+                    health *= 1.3;
+                }
+                mon.heal(health);
+            }
+        }
+        if (mon.ingrain) {
+            if (mon.healblock) {
+                game.write(mon.nick + " was prevented from healing by Heal Block.");
+            }
+            else {
+                game.write(mon.nick + " restored health through its roots.");
+                var health = mon.hp / 16;
+                if (mon.item == Item["Big Root"]) {
+                    health *= 1.3;
+                }
+                mon.heal(health);
+            }
+        }
+    }
+});
+
+
+//  Leech Seed
+/*  Leech Format:
+    leechseed = {
+        source : slot to send health 
+    }
+*/
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        mon = monsBySpeed[i];
+        if (mon.leechseed && mon.ability != Ability["Magic Guard"]) {
+            var damage = mon.hp / 16;
+            game.write(mon.nick + "'s health is drained by Leech Seed.");
+            mon.hurt(damage);
+            var target = slots[mon.leechseed.source];
+            if (target.healblock) {
+                game.write(target.nick + " was prevented from healing by Heal Block.");
+            }
+            else {
+                if (target.item == Item["Big Root"]) {
+                    damage *= 1.3;
+                }
+                target.heal(damage);
+            }
+        }
+    }
+});
+
+//  Poison, Burn, Poison Heal
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        var mon = monsBySpeed[i];
+        switch(mon.Status) {
+        case Poison:
+            if (mon.ability == Ability["Poison Heal"]) {
+                if (mon.healblock) {
+                    game.write(mon.nick + " was prevented from healing by Heal Block.");
+                }
+                else {
+                    game.write(mon.nick + "'s Poison Heal restores its health.");
+                    mon.heal(mon.hp / 8);
+                }
+            }
+            else if (mon.ability != Ability["Magic Guard"]) {
+                game.write(mon.nick + " is hurt by poison.");
+                mon.hurt(mon.hp / 8);
+            }
+            break;
+        case BadlyPoison:
+            mon.toxic++;
+            if (mon.ability == Ability["Poison Heal"]) {
+                if (mon.healblock) {
+                    game.write(mon.nick + " was prevented from healing by Heal Block.");
+                }
+                else {
+                    game.write(mon.nick + "'s Poison Heal restores its health.");
+                    mon.heal(mon.hp / 8);
+                }
+            }
+            else if (mon.ability != Ability["Magic Guard"]) {
+                game.write(mon.nick + " is hurt by poison.");
+                mon.hurt(mon.toxic * mon.hp / 16);
+            }
+            break;
+        case Burn:
+            if (mon.ability != Ability["Magic Guard"]) {
+                game.write(mon.nick + " is hurt by its burn.");
+                mon.hurt(mon.hp / 8);
+            }
+            break;
+        }
+    }
+});
+
+//  Nightmare
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        var mon = monsBySpeed[i];
+        if (mon.nightmare) {
+            if (mon.Status == Status.Asleep
+            &&  mon.ability != Ability["Magic Guard"]) {
+                game.write(mon.nick + " is hurt by Nightmare.");
+                mon.hurt(mon.hp / 4);
+            }
+            else {
+                mon.nightmare = false;
+            }
+        }
+    }
+});
+
+//  Ghost Curse
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        var mon = monsBySpeed[i];
+        if (mon.cursed && mon.ability != Ability["Magic Guard"]) {
+            game.write(mon.nick + " is afflicted by the Curse.");
+            mon.hurt(mon.hp / 4);
+        }
+    }
+});
 
 //  Binding Moves
-//  Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
+/*  Binding format:
+    binds = [];     //  starts empty
+    binds.push({    //  push new binds
+        source : mon that triggered it
+        move : move that triggered it
+        duration : time left for binding
+        band : whether a binding band boosts its power
+    });
+    binds.splice(i, 1)//remove binds
+*/
+game.loopevents.push(function() {
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        var mon = monsBySpeed[i];
+        for (var j = 0; j < mon.binds; j++) {
+            //  The source is on the field
+            if (field.monOnField(mon.binds.source)) {
+                //  Countdown
+                if (--mon.binds.duration && mon.ability != Ability["Magic Guard"]) {
+                    game.write(mon.nick + " is hurt by " + mon.binds[j].move);
+                    mon.hurt(mon.hp / (mon.binds[j].band ? 6 : 8));
+                }
+                //  Bind is over
+                else {
+                    game.write(mon.nick + " was freed from " + mon.binds[j].move);
+                    mon.binds.splice(j, 1);
+                }
+            }
+            //  Source no longer on the field; get rid of it
+            else {
+                mon.binds.splice(j, 1);
+            }
+        }
+    }
+});
 
 //  Individual countdowns
 game.loopevents.push(function() {
-    for (var i in monsBySpeed) {
+    for (var i = 0; i < monsBySpeed.length; i++) {
         var mon = monsBySpeed[i];
         if (mon.taunt) {
             if (!--mon.taunt) {
@@ -205,7 +440,7 @@ game.loopevents.push(function() {
 
 //  Team countdowns
 game.loopevents.push(function() {
-    for (var i in field.teams) {
+    for (var i = 0; i < field.teams.length; i++) {
         var team = field.teams[i];
         if (team.reflect) {
             if (!--team.reflect) {
@@ -281,12 +516,16 @@ game.loopevents.push(function() {
 
 //  Uproar
 //  Speed Boost, Bad Dreams, Harvest, Moody
+game.loopevents.push(function() {
+
+});
 
 
 //  Orb Activation, Sticky barb
 game.loopevents.push(function() {
-    for (var i in monsBySpeed) {
-        var mon = monsBySpeed[i];
+    for (var i = 0; i < monsBySpeed.length; i++) {
+        monsBySpeed[i].item.endOfTurn();
+
         //  Nested ifs allow for appropriate else
         if (mon.item == Item["Toxic Orb"]) {
             if (mon.Status == Status.Healthy) {
@@ -306,7 +545,7 @@ game.loopevents.push(function() {
 
 //  Zen Mode
 game.loopevents.push(function() {
-    for (var i in monsBySpeed) {
+    for (var i = 0; i < monsBySpeed.length; i++) {
         var mon = monsBySpeed[i];
         //  Only bother with Darmanitan
         if (mon.ability == Ability["Zen Mode"]) {
@@ -328,7 +567,7 @@ game.loopevents.push(function() {
 //  Healing Wish, Lunar Dance
 //  Spikes, Toxic Spikes, Stealth Rock (hurt in order applied)
 game.loopevents.push(function()) {
-    for (var i in field.teams) {
+    for (var i = 0; i < field.teams.length; i++) {
         var team = field.teams[i];
         if (team.onfield.length < team.monsleft) {
             //  Choose a mon to switch in
@@ -340,7 +579,7 @@ game.loopevents.push(function()) {
 
 //  Slow Start
 game.loopevents.push(function() {
-    for (var i in monsBySpeed) {
+    for (var i = 0; i < monsBySpeed.length; i++) {
         var mon = monsBySpeed[i];
         //  Only bother with mons that have Slow Start
         if (mon.slowstart) {
@@ -356,7 +595,7 @@ game.loopevents.push(function() {
 
 //  Roost ends
 game.loopevents.push(function() {
-    for (var i in monsBySpeed) {
+    for (var i = 0; i < monsBySpeed.length; i++) {
         monsBySpeed[i].roost = false;
     }
 })

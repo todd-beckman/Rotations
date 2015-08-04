@@ -3,6 +3,10 @@ var field = {
     turn : 0,
     //  The list of teams; init() fills this
     teams : [],
+    //  Slots to be filled by mons
+    slots : [],
+    //  Order of mons
+    monorder : [],
     //  Weather conditions
     weather : {
         type : 0,
@@ -19,7 +23,24 @@ var field = {
     wonderroom : 0,
     //  Trap conditions
     arenatrap : false,
-    shadowtag : false;
+    shadowtag : false,
+    //  Determines if a particular mon is on the field
+    monOnField : function (mon) {
+        for (var i = 0; i < monsBySpeed.length; i++) {
+            if (mon == monsBySpeed[i]) {
+                return true;
+            }
+        }
+        return false;
+    },
+    abilityOnField : function(ability) {
+        for (var i = 0; i < monsBySpeed.length; i++) {
+            if (monsBySpeed[i].ability == ability) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 var updateFieldGUI = function() {
@@ -32,3 +53,4 @@ var updateFieldGUI = function() {
     }
     document.getElementById("field").innerHTML = thestring;
 }
+
