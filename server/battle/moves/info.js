@@ -10,18 +10,130 @@ var MoveList = {
         target : "any adjacent",
         flags : {contact : 1, protect : 1, kingsrock : 1}
     },
-    
+    "Grass Pledge" : {
+        desc : "Damages the foe. Use with other Pledges for special effects.",
+        typing : "Grass",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 10,
+        power : 80,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1}
+    }
+    "Fire Pledge" : {
+        desc : "Damages the foe. Use with other Pledges for special effects.",
+        typing : "Fire",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 10,
+        power : 80,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1}
+    }
+    "Water Pledge" : {
+        desc : "Damages the foe. Use with other Pledges for special effects.",
+        typing : "Water",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 10,
+        power : 80,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1}
+    }
+    "Volt Switch" : {
+        desc : "Damages the target. The user then switches out.",
+        typing : "Electric",
+        contest : "Cool",
+        category : "Special",
+        pp : 20,
+        pow : 70,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        effects : {retreat : "uturn"}
+    },
+    "Struggle Bug" : {
+        desc : "Damages the opposing Pokemon and lowers their Special Attack.",
+        typing : "Bug",
+        contest : "Cute",
+        category : "Special",
+        pp : 20,
+        power : 50,
+        acc : 100,
+        target : "adjacent foes",
+        flags : {protect : 1},
+        onSuccess : function (user, foe) {
+            foe.onStatChange("Special Attack", -1, user);
+        }
+    }
+    "Bulldoze" : {
+        desc : "Damages all adjacent Pokemon and lowers their Speed.",
+        typing : "Ground",
+        contest : "Tough",
+        category : "Physical",
+        pp : 20,
+        power : 60,
+        acc : 100,
+        target : "all adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        onSuccess : function (user, foe) {
+            foe.onStatChange("Speed", -1, user);
+        }
+    }
+    "Frost Breath" : {
+        desc : "Damages the target and always lands a Critical Hit.",
+        typing : "Ice",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 10,
+        power : 60,
+        acc : 90,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        effects : {alwayscrit : 1}
+    },
+    "Dragon Tail" : {
+        desc : "Damages the foe and forces it to switch out.",
+        typing : "Dragon",
+        contest : "Tough",
+        category : "Physical",
+        pp : 10,
+        power : 60,
+        acc : 90,
+        effects : {priority : -6},
+        flags : {contact : 1, protect : 1},
+        target : "any adjacent",
+        onSuccess : function (user, foe) {
+            foe.onPhaze();
+        }
+    },
+    "Work Up" : {
+        desc : "Raises the user's Attack and Special Attack.",
+        typing : "Normal",
+        contest : "Tough",
+        category : "Status",
+        pp : 30,
+        target : "self",
+        flags : {snatch : 1},
+        onSuccess : function (user) {
+            user.onStatChange("Attack", 1);
+            user.onStatChange("Special Attack", 1);
+        }
+    },
     "Electroweb" : {
         desc : "Hits opposing foes and lowers each of ther Speed stats.",
         typing : "Electric",
         contest : "Beautiful",
+        category : "Special",
         pp : 15,
         power : 55,
         acc : 95
-        category : "Special",
         target : "adjacent foes",
         flags : {protect : 1, kingsrock : 1},
-        onSucces : function (user, foe) {
+        onSuccess : function (user, foe) {
             foe.onStatChange("Speed", -1, user);
         }
     },
@@ -1690,10 +1802,23 @@ var MoveList = {
         target : "all",
         flags : {protect : 1}, 
         onSuccess : function (user, foe) {
-            //  Only applied on targets it is successful for
             if (1 < foe.nonvolatile.hpleft) {
                 foe.hurt(foe.nonvolatile.hpleft / 2);
             }
         }
-    }   
+    },
+    //  Hallow's move
+    "Fancy Dance" : {
+        desc : "Raises the user's Special Attack and Critical Hit ratio.",
+        category : "Status",
+        contest : "Beautiful",
+        typing : "Fairy",
+        target : "self",
+        pp : 15,
+        flags : {snatch : 1},
+        onSuccess : function (user) {
+            user.onStatChange("Special Attack", 1);
+            user.onStatChange("Critical", 1);
+        }
+    },
 }

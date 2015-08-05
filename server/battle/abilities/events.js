@@ -11,16 +11,19 @@ var MoveData = {
             drain : 1,
             bind : false,
             crit : 1,
+            alwayscrit : 1,
             holdback : false,
             weather : "None",
             terrain : "None",
             thaw : 1,
+            nosky : 1,
             retreat : "batonpass", "uturn",
             typeeff : {
                 "Water" : 2;//freeze dry
             },
             dualtype : "Flying",
-            usedef : false
+            usedef : false,
+            ignoreboosts : false,
         },
         flags : {
             contact : 0,    protect : 0,    magic : 0,  snatch : 0,
@@ -159,11 +162,12 @@ var MonData = {
     template : {
         name : "Missingno",
         basestats : {
-            HP : 0, Attack : 0, Defense : 0, Speed : 0
+            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0
             "Special Attack" : 0, "Special Defense" : 0
         }
         types : ["Normal", "???"],
         abilities : ["No Ability", "No Ability", "No Ability"],
+        weight : 50
     },
     build : {
         nickname : "George Zip",
