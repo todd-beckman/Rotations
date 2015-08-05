@@ -3,12 +3,24 @@ var MoveData = {
         desc : "",
         typing : 18,    cat : 2,    pp : 0,     pow : 0,    acc : 0,
         priority : 0,
+        contest : "Clever",
         effects : {
+            multihit : false,   //  hit 2-5
+            dualhit : false,    //  hit 2
             recoil : 1,
             drain : 1,
             bind : false,
             crit : 1,
-            holdback : false
+            holdback : false,
+            weather : "None",
+            terrain : "None",
+            thaw : 1,
+            retreat : "batonpass", "uturn",
+            typeeff : {
+                "Water" : 2;//freeze dry
+            },
+            dualtype : "Flying",
+            usedef : false
         },
         flags : {
             contact : 0,    protect : 0,    magic : 0,  snatch : 0,
@@ -17,12 +29,22 @@ var MoveData = {
         //  Determine if the move's usage is appropriate
         preConditions : function (self, foe) { return bool; },
         takeChargeTurn : function (self, foe) { return bool; },
+        //  Just leave acc undefined if it always hits. This is for
+        //  special conditions such as Stomp
+        //  true = run test, false means skip
+        onAccuracyTest : function (user, foe) { return bool; },
+        onTypeModified : function (user, foe) { return type; },
+        //  For those times when a move's power varies
+        onPowerModified : function (user, foe) { return 1; },
         //  Determine if the self should be able to hit semi-invulnerable mons
         onTargetSemiInvulnerable : function (user, foe) { return bool; },
         //  Every time damage is dealt directly
         onDamageDealt : function (self, foe, damage) { return; },
-        //  When the move is fully done
-        onSuccess : function (self, foe) { return; }
+        //  When the move completes, once per foe
+        onSuccess : function (self, foe) { return; },
+        //  When the move completes, fired once
+        onComplete : function (self) { return; },
+        onFoeRetreat : function (self, foe) { return; }
     }
 }
 
@@ -131,6 +153,7 @@ var AbilityData = {
 
 
 //  Mons
+loadFromTemplate("name");   //  preserve teambuild
 var MonData = {
     //  Properties about the mon right out of the Dex
     template : {
@@ -141,7 +164,6 @@ var MonData = {
         }
         types : ["Normal", "???"],
         abilities : ["No Ability", "No Ability", "No Ability"],
-        mega : false,   //  It is permanent
     },
     build : {
         nickname : "George Zip",
@@ -149,42 +171,48 @@ var MonData = {
         item : "No Item",
         ability : "No Ability",
         ivs : {
-            HP : 0, Attack : 0, Defense : 0, Speed : 0
+            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
             "Special Attack" : 0, "Special Defense" : 0
         },
         evs : {
-            HP : 0, Attack : 0, Defense : 0,SpecialAttack : 0,
-            SpecialDefense : 0, Speed : 0
+            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
+            "Special Attack" : 0, "Special Defense" : 0
         }
     }
     //  Properties that stay until changed  
     nonvolatile : {
+        mega : false,
         nick : "George Zip",
         item : [object],
         ability : [object],
         types : [],
         stats : {
-            HP : 0, Attack : 0, Defense : 0,SpecialAttack : 0,
-            SpecialDefense : 0, Speed : 0
+            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
+            "Special Attack" : 0, "Special Defense" : 0
         },
         status : "Healthy",
         toxic : 0,
         movepp : [0, 0, 0, 0],
+        eatenberry : false,
         hyper : false,      //  Unofficial (Shadow)
     },
     //  Properties that are dropped when switched out
     volatile : {
         statboosts : {
-            HP : 0, Attack : 0, Defense : 0,SpecialAttack : 0,
-            SpecialDefense : 0, Speed : 0,  Accuracy : 0,
-            Evasion : 0
-        }
+            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
+            "Special Attack" : 0, "Special Defense" : 0,
+            "Accuracy" : 0, "Evasion" : 0
+        },
+        extratype : "???",
+        protectcount : 0,
         choicelock : false, //  Save the move
         lastmove : "No Move",
         attract : false,    //  Save the target
         substitute : 0,     //  Save the HP
         block : [],         //  Save the sources
         grounded : false,
+        powder : false,
+        minimize : false,
         binding : [{        //  List of bindings
             move : "No Move",
             turns : 0,
@@ -195,6 +223,7 @@ var MonData = {
         bouncing : false,
         phantom : false,
         diving : false,
+        charging : false,
         //  1 charge turn is all that is needed
         countdown : {
             confuse : 0,
@@ -211,13 +240,29 @@ var MonData = {
             healblock : 0
         },
     },
+    //  same as thisturn, loaded next turn
+    nextturn : {}
     //  Properties that only exist this turn
     thisturn : {
+        fairylock : source,
+        electricfy : false,
+        //  true when switched in, false when sent out naturally
+        hasmoved : true,
         endure : false,
         protection : {
             protect : false,
             spikyshield : false,
+            //  Only one 's'
             kingshield : false
+        }
+        decision : {
+            option : "Fight" or "Switch"
+            //  if fight:
+            mega : false,
+            rotate : false, "Left" or "Right"
+            move : to move using
+            //  if switch:
+            mon : to replace it
         }
     }
 }
@@ -239,6 +284,7 @@ var TeamData = {
         stealthrock : false
         spikes : 0,
         toxicspikes : 0,
+        stickyweb : false,
     }
     thisturn : {
         protection : {
@@ -254,6 +300,7 @@ var FieldData = {
     trickroom : 0,      //  Turn count
     magicroom : 0,      //  Turn count
     wonderroom : 0,     //  Turn count
+    lastmove : "No Move",
     weather : {
         type : "None",
         turns : 0
@@ -261,6 +308,9 @@ var FieldData = {
     terrain : {
         type : "None",
         turns : 0
+    }
+    thisturn : {
+        iondeluge : false
     }
 }
 
