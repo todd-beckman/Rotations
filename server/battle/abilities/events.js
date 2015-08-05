@@ -17,6 +17,7 @@ var MoveData = {
             terrain : "None",
             thaw : 1,
             nosky : 1,
+            ohko : 1,
             retreat : "batonpass", "uturn",
             typeeff : {
                 "Water" : 2;//freeze dry
@@ -41,8 +42,8 @@ var MoveData = {
         onPowerModified : function (user, foe) { return 1; },
         //  Determine if the self should be able to hit semi-invulnerable mons
         onTargetSemiInvulnerable : function (user, foe) { return bool; },
-        //  Every time damage is dealt directly
-        onDamageDealt : function (self, foe, damage) { return; },
+        //  Manually provide the damage output of the move.
+        getDamageOutput : function (self, foe, damage) { return 1; },
         //  When the move completes, once per foe
         onSuccess : function (self, foe) { return; },
         //  When the move completes, fired once
@@ -56,6 +57,8 @@ var MoveData = {
 //  Items
 var ItemData = {
     mega : "Missingno",
+    gem : 1,
+    berry : 1,
     extend : {
         "Rain" : 8,
         "Hail" : 8,
@@ -184,7 +187,7 @@ var MonData = {
         }
     }
     //  Properties that stay until changed  
-    nonvolatile : {
+    permanent : {
         mega : false,
         nick : "George Zip",
         item : [object],
@@ -201,7 +204,7 @@ var MonData = {
         hyper : false,      //  Unofficial (Shadow)
     },
     //  Properties that are dropped when switched out
-    volatile : {
+    temporary : {
         statboosts : {
             "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
             "Special Attack" : 0, "Special Defense" : 0,

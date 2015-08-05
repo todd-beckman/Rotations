@@ -10,6 +10,360 @@ var MoveList = {
         target : "any adjacent",
         flags : {contact : 1, protect : 1, kingsrock : 1}
     },
+    
+    "Clear Smog" : {
+        desc : "Damages the target and clears its stat changes.",
+        typing : "Poison",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 15,
+        power : 50,
+        flags : {protect : 1, kingsrock : 1},
+        preCondition : function (user, foe) {
+            return !(foe.temporary.fly || foe.temporary.dig
+            ||  foe.temporary.dive || foe.temporary.phantom
+            ||  foe.temporary.skydrop || foe.temporary.bounce);
+        },
+        onSuccess : function (user, foe) {
+            if (!foe.temporary.substitute) {
+                foe.temporary.statboosts = {
+                    "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
+                    "Special Attack" : 0, "Special Defense" : 0,
+                    "Accuracy" : 0, "Evasion" : 0
+                };
+            }
+        }
+    },
+    "Stored Power" : {
+        desc : "Damages the target. Gets stronger as the user gains stat boosts.",
+        typing : "Psychic",
+        contest : "Clever",
+        category : "Special",
+        pp : 10,
+        power : 20,
+        acc : 100,
+        flags : {protect : 1, kingsrock : 1}
+        target : "any adjacent",
+        onPowerModified : function (user) {
+            //  Always does *something*
+            var count = 1;
+            for (var i in user.temporary.statboosts) {
+                var boosts = user.temporary.statboosts[i];
+                if (0 < boosts) {
+                    count += boosts;
+                }
+            }
+            return 20 * count;
+        }
+    },
+    "Quick Guard" : {
+        desc : "Blocks priority moves from targetting the user's team.",
+        typing : "Fighting",
+        contest : "Cool",
+        category : "Status",
+        pp : 15,
+        effects : {priority : 1},
+        target : "user team",
+        onSuccess : function (user) {
+            user.team.protection.quickguard = true;
+        }
+    },
+    "Ally Switch" : {
+        desc : "Switches places with the ally opposite it. Fails if the user is in the middle of a Triples battle.",
+        typing : "Psychic",
+        contest : "Clever",
+        category : "Status",
+        pp : 15,
+        effects : {priority : 1},
+        target : "self",
+        preCondition : function (user) {
+            if (field.mode == "Triples") {
+                var slot = user.getSlot();
+                //  [0, 1, 2], 3, 4, 5 (1 is in the middle)
+                switch (slot) {
+                    case 1:
+                        return false;
+                    case 0:
+                        return !(user.team.slots[2].empty);
+                    case 2:
+                        return !(user.team.slots[0].empty);
+                }
+            }
+            if (field.mode == "Doubles") {
+                var slot = user.getSlot();
+                return !(user.team.slots[(slot + 1) % 2].empty);
+            }
+            return false;
+        },
+        onSuccess : function (user) {
+            //  for security, define dest so nothing happens at the worst
+            var slot = user.getSlot(), dest = slot;
+            if (field.mode == "Triples") {
+                dest = slot ? 0 : 2;
+            }
+            else if (field.mode == "Doubles") {
+                dest = slot ? 0 : 1;
+            }
+            user.team.slots[slot] = user.team.slots[dest];
+            user.team.slots[dest] = user;
+        }
+    },
+    "Scald" : {
+        desc : "Damages the target with a 30% Burn chance.",
+        typing : "Water",
+        contest : "Tough",
+        category : "Special",
+        pp : 15,
+        power : 80,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1, thaw : 1},
+        onSuccess : function (user, foe) {
+            if (foe.permanent.health == "Freeze") {
+                foe.thaw();
+            }
+            if (game.rand(user, 10) < 3) {
+                foe.onGetStatus("Burn");
+            }
+        }
+    },
+    "Shell Smash" : {
+        desc : "Lowers the user's Defense and Special Defense, then sharply raises the uer's Attack, Special Attack, and Speed."
+        typing : "Normal",
+        contest : "Tough",
+        category : "Status",
+        pp : 15,
+        flags : {snatch : 1},
+        target : "self",
+        onSuccess : function (user) {
+            user.onStatChange("Defense", -1);
+            user.onStatChange("Special Defense", -1);
+            user.onStatChange("Attack", 2);
+            user.onStatChange("Special Attack", 2);
+            user.onStatChange("Speed", 2);
+        }
+    },
+    "Heal Pulse" : {
+        desc : "Heals the target.",
+        typing : "Psychic",
+        contest : "Beautiful",
+        category : "Status",
+        pp : 10,
+        target : "any",
+        flags : {protect : 1, magic : 1, launcher : 1},
+        onSuccess : function (user, foe) {
+            //  hardcoded since Mega Launcher fires on damage calc
+            //  which is not run for status moves
+            if (user.permanent.ability.launcher) {
+                foe.heal(foe.permanent.basestats.hp * .75);
+            }
+            else {
+                foe.heal(foe.permanent.basestats.HP / 2);
+            }
+        }
+    },
+    "Hex" : {
+        desc : "Damages the target. Doubles in power against foes with Status afflictions.",
+        typing : "Ghost",
+        contest : "Clever",
+        status : "Special",
+        pp : 10,
+        power : 65,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        onPowerModified : function (user, foe) {
+            if (foe.permanent.health != "Healthy") {
+                return 130;
+            }
+            return 65;
+        }
+    },
+    //  TODO
+    "Sky Drop" : {
+        desc : "Picks up the target on the first turn and then attacks the second.",
+        typing : "Flying",
+        contest : "Tough",
+        category : "Physical",
+        pp : 10,
+        power : 60,
+        acc : 100,
+        preCondition : function (user, foe) {
+            if (field.countdown.gravity) {
+                return false;
+            }
+            return true;
+        }
+    },
+    "Shift Gear" : {
+        desc : "Raises the user's Attack and sharply raises its Speed.",
+        typing : "Steel",
+        contest : "Clever",
+        category : "Status",
+        pp : 10,
+        target : "self",
+        flags : {snatch : 1},
+        onSuccess : function (user) {
+            user.onStatChange("Attack", 1);
+            user.onStatChange("Speed", 2);
+        }
+    },
+    "Circle Throw" : {
+        desc : "Damages the target and forces it to switch.",
+        typing : "Fighting",
+        category : "Physical",
+        target : "any adjacent",
+        contest : "Cool",
+        pp : 10,
+        power : 60,
+        acc : 90,
+        effects : {priority: -6},
+        flags : {contact : 1, protect : 1},
+        onComplete : function (user, foe) {
+            foe.onPhaze();
+        }
+    },
+    "Incinerate" : {
+        desc : "Damages the opposing Pokemon and ruins their Berries and Gems.",
+        typing : "Fire",
+        contest : "Tough",
+        category : "Special",
+        pp : 15,
+        power : 60,
+        acc : 100,
+        target : "adjacent foes",
+        flags : {protect : 1, kingsrock : 1},
+        onSuccess : function (user, foe) {
+            if (foe.permanent.item) {
+                if (foe.permanent.item.berry
+                ||  foe.permanent.item.gem) {
+                    foe.loseItem();
+                }
+            }
+        }
+    },
+    "Quash" : {
+        desc : "Target moves last if it hasn't moved yet.",
+        typing : "Dark",
+        contest : "Clever",
+        category : "Status",
+        pp : 15,
+        acc : 100,
+        flags : {protect : 1, magic : 1},
+        target : "any adjacent",
+        preCondition : function (user, foe) {
+            return !(foe.hasmoved);
+        },
+        onSuccess : function (user, foe) {
+            //  I swear this is not bad design
+            var i = field.monsSorted.indexOf(foe);
+            field.monsSorted.splice(i, 1);
+            field.monsSorted.push(foe);
+        }
+    },
+    "Acrobatics" : {
+        desc : "Damages the target. If the user has no item, the power is doubled.",
+        typing : "Flying",
+        contest : "Cool",
+        category : "Physical",
+        pp : 15,
+        power : 55,
+        acc : 100,
+        target : "any",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        onPowerModified : function (user) {
+            if (user.permanent.item) {
+                return 55;
+            }
+            return 110;
+        }
+    },
+    "Reflect Type" : {
+        desc : "Changes types to match the target's.",
+        typing : "Normal",
+        contest : "Clever",
+        category : "Status",
+        pp : 15,
+        target : "any adjacent",
+        flags : {snatch : 1},
+        preCondition : function (user, foe) {
+            //  Must hard-code this.
+            return !(foe.teambuild.ability == "Multitype");
+        },
+        onSuccess : function (user, foe) {
+            user.permanent.types : foe.template.types;
+        }
+    },
+    "Retaliate" : {
+        desc : "Damages a target. Doubles in power if a member of the user's team fainted last turn.",
+        typing : "Normal",
+        contest : "Cool",
+        category : "Physical",
+        pp : 5,
+        acc : 100,
+        power : 70,
+        target : "any adjacent",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        onPowerModified : function (user) {
+            if (user.team.thisturn.retaliate) {
+                return 140;
+            }
+            return 70;
+        }
+    },
+    "Final Gambit" : {
+        desc : "Normal",
+        contest : "Tough",
+        category : "Physical",
+        pp : 5,
+        acc : 100,
+        flags : {contact : 1, protect : 1},
+        getDamageOutput : function (self, foe) {
+            var damage = self.permanent.hpleft;
+            //  Self faints first
+            self.permanent.hpleft = 0;
+            self.onFaint();
+            return damage;
+        }
+    },
+    "Bestow" : {
+        desc : "User gives the target its item.",
+        typing : "Normal",
+        contest : "Cute",
+        category : "Status",
+        pp : 15,
+        target : "any adjacent",
+        flags : {protect : 1},
+        preCondition : function (user, foe) {
+            //  Foe can't be holding an item
+            if (foe.permanent.item) {
+                return false;
+            }
+            //  User must be able to let go of the item
+            if (user.permanent.item.stickyhold) {
+                return false;
+            }
+        },
+        onSuccess : function (user, foe) {
+            foe.giveItem(user.permanent.item);
+            user.takeItem();
+        }
+    },
+    "Inferno" : {
+        desc : "Damages and burns the target.",
+        typing : "Fire",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 5,
+        power : 100,
+        acc : 50,
+        target : "any adjacent",
+        flags : {protect : 1},
+        onSuccess : function (user, foe) {
+            foe.onGetStatus("Burn", user);
+        }
+    },
+    //  TODO Pledges
     "Grass Pledge" : {
         desc : "Damages the foe. Use with other Pledges for special effects.",
         typing : "Grass",
@@ -106,7 +460,7 @@ var MoveList = {
         effects : {priority : -6},
         flags : {contact : 1, protect : 1},
         target : "any adjacent",
-        onSuccess : function (user, foe) {
+        onComplete : function (user, foe) {
             foe.onPhaze();
         }
     },
@@ -290,13 +644,13 @@ var MoveList = {
         target : "any adjacent",
         flags : {contact : 1, protect : 1},
         onAccuracyTest : function (user, foe) {
-            if (foe.volatile.minimze) {
+            if (foe.temporary.minimze) {
                 return false;
             }
             return true;
         }
         onPowerModified : function (user, foe) {
-            if (foe.volatile.minimize) {
+            if (foe.temporary.minimize) {
                 return 130;
             }
             return 65;
@@ -371,9 +725,9 @@ var MoveList = {
         flags : {protect : 1, kingsrock : 1},
         onAccuracyTest : function (user, foe) {
             return !field.weather.type == "Rain"
-            ||  !foe.volatile.flying
-            ||  !foe.volatile.bouncing
-            ||  !foe.volatile.skydrop;
+            ||  !foe.temporary.flying
+            ||  !foe.temporary.bouncing
+            ||  !foe.temporary.skydrop;
         },
         onSuccess : function (user, foe) {
             if (game.rand(user, 10) < 3) {
@@ -432,7 +786,7 @@ var MoveList = {
         target : "any adjacent",
         flags : {protect : 1, kingsrock : 1},
         onTypeModified : function (user) {
-            var item = user.nonvolatile.item;
+            var item = user.permanent.item;
             if (item && item.technoBlast) {
                 return item.technoBlast();
             }
@@ -547,11 +901,11 @@ var MoveList = {
         target : "any adjacent",
         flags : {protect : 1, kingsrock : 1},
         takeChargeTurn : function (user, foe) {
-            if (user.volatile.charging) {
-                user.volatile.charging = false;
+            if (user.temporary.charging) {
+                user.temporary.charging = false;
                 return true;
             }
-            user.volatile.charging = true;
+            user.temporary.charging = true;
             return false;
         },
         onSuccess : function (user, foe) {
@@ -571,11 +925,11 @@ var MoveList = {
         target : "any adjacent",
         flags : {protect : 1, kingsrock : 1},
         takeChargeTurn : function (user, foe) {
-            if (user.volatile.charging) {
-                user.volatile.charging = false;
+            if (user.temporary.charging) {
+                user.temporary.charging = false;
                 return true;
             }
-            user.volatile.charging = true;
+            user.temporary.charging = true;
             return false;
         },
         onSuccess : function (user, foe) {
@@ -700,7 +1054,7 @@ var MoveList = {
         flags : {protect : 1},
         target : "any adjacent",
         preCondition : function (user) {
-            if (user.nonvolatile.eatenberry) {
+            if (user.permanent.eatenberry) {
                 return true;
             }
             return false;
@@ -749,7 +1103,7 @@ var MoveList = {
         flags : {contact : 1, protect : 1, kingsrock : 1},
         target : "any adjacent",
         onSuccess : function (user, foe) {
-            if (foe.nonvolatile.hpleft == 0) {
+            if (foe.permanent.hpleft == 0) {
                 user.onStatChange("Attack", 2);
             }
         }
@@ -778,8 +1132,8 @@ var MoveList = {
             return 90;
         },
         takeChargeTurn : function (self, foe) {
-            if (!user.volatile.phantom) {
-                user.volatile.phantom = true;
+            if (!user.temporary.phantom) {
+                user.temporary.phantom = true;
                 game.write(user.build.nick + " vanished instantly!");
                 return true;
             }
@@ -799,7 +1153,7 @@ var MoveList = {
             return !foe.hasType("Ghost");
         },
         onSuccess : function (user, foe) {
-            foe.volatile.extratype = "Ghost";
+            foe.temporary.extratype = "Ghost";
         }
     },
     "Noble Roar" : {
@@ -851,7 +1205,7 @@ var MoveList = {
             return !foe.hasType("Grass");
         },
         onSuccess : function (user, foe) {
-            foe.volatile.extratype = "Grass";
+            foe.temporary.extratype = "Grass";
         }
     },
     "Petal Blizzard" : {
@@ -913,8 +1267,8 @@ var MoveList = {
         target : "any adjacent",
         flags : {protect : 1, kingsrock : 1},
         onSuccess : function (user, foe) {
-            for (var i in foe.volatile.statboosts) {
-                foe.volatile.statboosts[i] *= -1;
+            for (var i in foe.temporary.statboosts) {
+                foe.temporary.statboosts[i] *= -1;
             }
         }
     },
@@ -1244,8 +1598,8 @@ var MoveList = {
                 if (team != user.team) {
                     for (var j = 0; j < team.onfield.length; j++) {
                         var mon = team.onfield[j];
-                        if (mon.nonvolatile.status == "Poison"
-                        ||  mon.nonvolatile.status == "BadPoison") {
+                        if (mon.permanent.health == "Poison"
+                        ||  mon.permanent.health == "BadPoison") {
                             return true;
                         }
                     }
@@ -1253,8 +1607,8 @@ var MoveList = {
             }
         },
         onSuccess : function (user, foe) {
-            if (mon.nonvolatile.status == "Poison"
-            ||  mon.nonvolatile.status == "BadPoison") {
+            if (mon.permanent.health == "Poison"
+            ||  mon.permanent.health == "BadPoison") {
                 foe.onStatChange("Attack", -1, user);
                 foe.onStatChange("Special Attack", -1, user);
                 foe.onStatChange("Speed", -1, user);
@@ -1271,7 +1625,7 @@ var MoveList = {
         flags : {protect : 1},
         effects : {priority : 1},
         onSuccess : function (user, foe) {
-            foe.volatile.powder = true;
+            foe.temporary.powder = true;
             game.write(foe.build.nick + " was covered in Powder!");
         }
     },
@@ -1283,8 +1637,8 @@ var MoveList = {
         pp : 10,
         target : "self",
         takeChargeTurn : function (user) {
-            if (!user.volatile.charging) {
-                user.volatile.charging = true;
+            if (!user.temporary.charging) {
+                user.temporary.charging = true;
                 game.write(user.build.nick + " is absorbing pow!");
                 user.nextturn.decision = {move : Move["Geomancy"], target : user};
                 return true;
@@ -1306,8 +1660,8 @@ var MoveList = {
         target : "all self",
         onSuccess : function (user, foe) {
             if (foe == user
-            || foe.volatile.ability == Ability["Plus"]
-            || foe.volatile.ability == Ability["Minus"]) {
+            || foe.temporary.ability == Ability["Plus"]
+            || foe.temporary.ability == Ability["Minus"]) {
                 foe.onStatChange("Defense", 1);
                 foe.onStatChange("Special Defense", 1);
             }
@@ -1484,7 +1838,7 @@ var MoveList = {
             //  Either never blocked yet or not already blocking
             if (!foe.block || -1 == foe.block.indexOf(user)) {
                 foe.block.push(user);
-                game.write(foe.nonvolatile.nick + " can no longer escape!");
+                game.write(foe.permanent.nick + " can no longer escape!");
             }
         }
     },
@@ -1559,7 +1913,7 @@ var MoveList = {
         flags : {kingsrock : 1},
         preConditions : function (user) {
             if (user.template.name == "Hoopa") {
-                game.write("But " + user.nonvolatile.nick + " can't use it the way it is now.");
+                game.write("But " + user.permanent.nick + " can't use it the way it is now.");
                 return false;
             }
             if (user.template.name != "Hoopa-Confined") {
@@ -1596,8 +1950,8 @@ var MoveList = {
         flags : {contact : 1, protect : 1, kingsrock : 1},
         effects : {crit : 1},
         takeChargeTurn : function (user) {
-            if (!user.volatile.hyper) {
-                user.volatile.hyper = true;
+            if (!user.temporary.hyper) {
+                user.temporary.hyper = true;
                 game.write(user.build.nick + "'s emotions rose to a fever pitch!");
                 return true;
             }
@@ -1731,7 +2085,7 @@ var MoveList = {
         flags : {protect : 1},
         onSuccess : function (user, foe) {
             foe.block.push(user);
-            game.write(foe.nonvolatile.nick + " can no longer escape!");
+            game.write(foe.permanent.nick + " can no longer escape!");
         }
     },
     "Shadow Mist" : {
@@ -1802,8 +2156,8 @@ var MoveList = {
         target : "all",
         flags : {protect : 1}, 
         onSuccess : function (user, foe) {
-            if (1 < foe.nonvolatile.hpleft) {
-                foe.hurt(foe.nonvolatile.hpleft / 2);
+            if (1 < foe.permanent.hpleft) {
+                foe.hurt(foe.permanent.hpleft / 2);
             }
         }
     },
