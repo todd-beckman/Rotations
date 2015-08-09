@@ -10,7 +10,387 @@ var MoveList = {
         target : "any adjacent",
         flags : {contact : 1, protect : 1, kingsrock : 1}
     },
-    
+    //  TODO
+    "Smack Down" : {
+        desc : "Damages the target and knocks out of the air.",
+        typing : "Rock",
+        contest : "Tough",
+        pp : 15,
+        power : 50,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        onPowerModified : function (user, foe) {
+            if (foe.temporary.flying
+            ||  foe.temporary.bouncing
+            ||  foe.temporary.skydrop) {
+                return 100;
+            }
+            return 50;
+        }
+    },
+    "Storm Throw" : {
+        desc : "Damages the target and always lands a Critical Hit.",
+        typing : "Figting",
+        contest : "Cool",
+        category : "Physical",
+        pp : 10,
+        power : 60,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        effects : {alwayscrit : 1}
+    },
+    "Flame Burst" : {
+        desc : "Damages the target. Adjacent Pokemon are also hurt.",
+        typing : "Fire",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 15,
+        power : 70,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1},
+        onSuccess : function (user, foe) {
+            var dam = function (mon) {
+                if (mon) {
+                        mon.onResidualDamageTaken(mon.permanent.hp / 16);
+                }
+            }
+            if (field.mode == "Triples") {
+                var slot = foe.slot();
+                if (slot == 0 || slot == 2) {
+                    dam(foe.team.slots[1]);
+                }
+                else {
+                    dam(foe.team.slots[0]);
+                    dam(foe.team.slots[2]);
+                }
+            }
+            else if (field.mode == "Doubles") {
+                var slot = foe.slot();
+                dam(foe.team.slots[(slot + 1) % 2]);
+            }
+        }
+    },
+    "Sludge Wave" : {
+        desc : "Damages all adjacent Pokemon and has a 10% chance of poison each of them.",
+        typing : "Poison",
+        category : "Tough",
+        category : "Special",
+        pp : 10,
+        power : 95,
+        acc : 100,
+        flags : {protect : 1},
+        onSuccess : function (user, foe) {
+            if (game.rand(user, 10) < 1) {
+                foe.onGetStatus("Poison", user);
+            }
+        }
+    },
+    "Quiver Dance" : {
+        desc : "Raises the user's Special Attack, Special Defense, and Speed.",
+        typing : "Bug",
+        contest : "Beautiful",
+        category : "Status",
+        pp : 20,
+        target : "self",
+        flags : {snatch : 1},
+        onPowerModified : function (user) {
+            user.onStatChange("Special Attack", 1);
+            user.onStatChange("Special Defense", 1);
+            user.onStatChange("Speed", 1);
+        }
+    },
+    "Heavy Slam" : {
+        desc : "Deals more damage the heavier the user is than the target. ",
+        typing : "Steel",
+        contest : "Tough",
+        category : "Physical",
+        pp : 10,
+        power : 80,
+        acc : 100,
+        target : "any adjacent",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        onPowerModified : function (user, foe) {
+            var src = user.weight();
+            var tar = foe.weight();
+            //  Divide by 0 glitch that caused PO server crashes
+            //  and lots of headaches
+            //  Only possible if the foe is Gastly holding Float Stone
+            if (Math.floor(tar) == 0) {
+                tar = 1;
+            }
+            var ratio = tar / src;
+            if (ratio <= .2) {
+                return 120;
+            }
+            if (ratio <= .25) {
+                return 100;
+            }
+            if (ratio <= 1/3) {
+                return 80;
+            }
+            if (ratio <= .5) {
+                return 60;
+            }
+            return 40;
+        }
+    },
+    "Synchronoise" : {
+        desc : "Damages all adjacent Pokemon with a type matching the user's."
+        typing : "Psychic",
+        contest : "Clever",
+        category : "Special",
+        target : "all adjacent",
+        pp : 15,
+        power : 120,
+        acc : 100,
+        flags : {protect : 1, kingsrock : 1},
+        preCondition : function (user, foe) {
+            for (var i = 0; i < user.template.types.length; i++) {
+                var type = user.type(i);
+                if (type != "???" && foe.hasType(type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    },
+    "Electro Ball" : {
+        desc : "Deals damage proportionate to how much faster the user is than the target.",
+        typing : "Electric",
+        contest : "Cool",
+        category : "Special",
+        target : "any adjacent",
+        pp : 10,
+        power : 60,
+        acc : 100,
+        flags : {protect : 1, kingsrock : 1},
+        onPowerModified : function (user, foe) {
+            var source = user.speed();
+            var target = foe.speed();
+            var ratio = target / source;
+            if (ratio < .25) {
+                return 150;
+            }
+            if (ratio < .34) {
+                return 120;
+            }
+            if (ratio < .5)  {
+                return 80;
+            }
+            return 60;
+        }
+    },
+    "Soak" : {
+        desc : "Changes the target's type to Water.",
+        typing : "Water",
+        contest : "Cute",
+        category : "Status",
+        pp : 20,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, magic : 1},
+        preCondition : function (user, foe) {
+            return foe.ability() != Ability["Multitype"];
+        },
+        onSuccess : function (user, foe) {
+            foe.temporary.types = ["Water"];
+            game.write(foe.build.nick : " transformed into the Water type!");
+        }
+    },
+    "Flame Charge" : {
+        desc : "Damages the target and raises the user's Speed.",
+        typing : "Fighting",
+        contest : "Cool",
+        category : "Physical",
+        pp : 20,
+        power : 50,
+        acc : 100,
+        target : "any adjacent",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        onSuccess : function (user) {
+            user.onStatChange("Speed", -1);
+        }
+    },
+    "Coil" : {
+        desc : "Raises the user's Attack, Defense, and Accuracy.",
+        typing : "Poison",
+        contest : "Tough",
+        category : "Status",
+        flags : {snatch : 1},
+        target : "self",
+        onSuccess : function (user) {
+            user.onStatChange("Attack", 1);
+            user.onStatChange("Defense", 1);
+            user.onStatChange("Accuracy", 1);
+        }
+    },
+    "Low Sweep" : {
+        desc : "Damages the target and lowers its Speed.",
+        typing : "Fighting",
+        contest : "Tough",
+        category : "Physical",
+        pp : 20,
+        power : 65,
+        acc : 100,
+        target : "any adjacent",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        onSuccess : function (user, foe) {
+            foe.onStatChange("Speed", -1, user);
+        }
+    },
+    "Acid Spray" : {
+        desc : "Damages the target and sharply lowers its Special Defense.",
+        typing : "Poison",
+        contest : "Beautiful",
+        pp : 20,
+        power : 40,
+        acc : 100,
+        flags : {protect : 1, kingsrock : 1},
+        target : "any adjacent",
+        onSuccess : function (user, foe) {
+            foe.onStatChange("Special Defense", -2, user);
+        }
+    },
+    "Foul Play" : {
+        desc : "Deals damage using the target's Attack and stat changes.",
+        typing : "Dark",
+        contest : "Clever",
+        category : "Physical",
+        pp : 15,
+        power : 95,
+        acc : 100,
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        target : "any adjacent",
+        effects : {usefoestats : 1}
+    },
+    "Simple Beam" : {
+        desc : "Changes the target's Ability to the user's.",
+        typing : "Normal",
+        contest : "Cute",
+        category : "Status",
+        pp : 15,
+        acc : 100,
+        flags : {protect : 1, magic : 1},
+        preCondition : function (user, foe) {
+            return (!foe.ability().nosimple);
+        },
+        onSuccess : function (user, foe) {
+            foe.temporary.ability = Ability["Simple"];
+        }
+    },
+    "Entrainment" : {
+        desc : "Changes the target's Ability to the user's.",
+        typing : "Normal",
+        contest : "Cute",
+        category : "Status",
+        pp : 15,
+        acc : 100,
+        flags : {protect : 1, magic : 1},
+        preCondition : function (user, foe) {
+            return (!foe.ability().persist);
+        },
+        onSuccess : function (user, foe) {
+            foe.temporary.ability = user.ability();
+        }
+    },
+    "After You" : {
+        desc : "Force the target to move next if it hasn't already.",
+        typing : "Normal",
+        contest : "Cute",
+        category : "Status",
+        pp : 15,
+        preCondition : function (user, foe) {
+            if (foe.hasMoved)) {
+                return false;
+            }
+            var source = field.monsSorted.indexOf(user);
+            var target = field.monsSorted.indexOf(foe);
+            //  They are moving next anyway
+            return (target - source != 1);
+        },
+        onSuccess : function (user, foe) {
+            var source = field.monsSorted.indexOf(user);
+            var target = field.monsSorted.indexOf(foe);
+            field.monsSorted.splice(target, 1);
+            field.monsSorted.splcie(source + 1, 0, target);
+        }
+    },
+    "Round" : {
+        desc : "Damages the target. Increases power if an ally joins in.",
+        typing : "Normal",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 15,
+        power : 60,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1, sound : 1},
+        onPowerModified : function (user) {
+            if (user.thisturn.round) {
+                return 120;
+            }
+            return 60;
+        }
+        onSuccess: function (user) {
+            var slot = user.slot();
+            var index = field.monsSorted().indexOf(user);
+            for (var i = 0; i < user.team.onfield; i++) {
+                if (slot != i) {
+                    var other = user.team.slots[i];
+                    if (!other.hasMoved
+                    &&  other.decision.move
+                    &&  other.decision.move == Move["Round"]) {
+                        var index2 = field.monsSorted().indexOf(user);
+                        if (index < index2) {
+                            other.thisturn.round = true;
+                            field.monsSorted.splice(index2, 1);
+                            field.monsSorted.splice(index + 1, 0, other);
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Echoed Voice" : {
+        desc : "Damages the target. Increases power if used in succession.",
+        typing : "Normal",
+        contest : "Beautiful",
+        category : "Special",
+        pp : 15,
+        power : 40,
+        acc : 100,
+        target : "any adjacent",
+        flags : {protect : 1, kingsrock : 1, sound : 1},
+        onPowerModified : function () {
+            if (!field.echoedvoice) {
+                field.echoedvoice = 1;
+            }
+            var power = 40 * field.echoedvoice;
+            if (200 < power) {
+                power = 200;
+            }
+            return power;
+        }
+        onComplete : function () {
+            //  Enforce once per round regardless of mons
+            field.addEchoedVoice();
+        }
+    },
+    "Chip Away" : {
+        desc : "Damages the target, ignoring Defense and Evasion boosts.",
+        typing : "Normal",
+        contest : "Tough",
+        category : "Physical",
+        pp : 20,
+        power : 70,
+        acc : 100,
+        target : "any adjacent",
+        flags : {contact : 1, protect : 1, kingsrock : 1},
+        effects : {ignoreboosts : 1}
+    },
     "Clear Smog" : {
         desc : "Damages the target and clears its stat changes.",
         typing : "Poison",
@@ -601,7 +981,7 @@ var MoveList = {
             if (Math.floor(tar) == 0) {
                 tar = 1;
             }
-            var ratio = src / tar;
+            var ratio = tar / src;
             if (ratio <= .2) {
                 return 120;
             }
@@ -1296,8 +1676,8 @@ var MoveList = {
         preCondition : function (user, foe) {
             for (var i = 0; i < field.teams.length; i++) {
                 var team = field.teams[i];
-                for (var j = 0; j < team.onfield.length; j++) {
-                    var mon = team.onfield[j];
+                for (var j = 0; j < team.onfield; j++) {
+                    var mon = team.slots[j];
                     //  Mons that switched on thusfar have moved
                     if (!mon.thisturn.hasmoved) {
                         return true;
@@ -1305,7 +1685,7 @@ var MoveList = {
                 }
             }
             return false;
-        }
+        },
         onSuccess : function (user) {
             user.team.thisturn.protection.craftyshield = true;
         }

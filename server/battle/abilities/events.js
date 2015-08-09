@@ -25,6 +25,7 @@ var MoveData = {
             dualtype : "Flying",
             usedef : false,
             ignoreboosts : false,
+            usefoestats : false,
         },
         flags : {
             contact : 0,    protect : 0,    magic : 0,  snatch : 0,
@@ -54,59 +55,6 @@ var MoveData = {
 
 //  Abilities
 
-//  Items
-var ItemData = {
-    mega : "Missingno",
-    gem : 1,
-    berry : 1,
-    extend : {
-        "Rain" : 8,
-        "Hail" : 8,
-        "Sun" : 8,
-        "Sand" : 8,
-        "Shadow" : 8,       //  Unofficial
-        "Trick Room", 8,    //  Unofficial
-        "Magic Room", 8,    //  Unofficial
-        "Wonder Room", 8,   //  Unofficial
-        "Bind" : 5,
-        "Multihit" : 5
-    };
-    //  Allow items to change move power
-    onMovePowerMultiplier : function (self, foe, move) { return 1; },
-    //  Allow items to change stats
-    onAttackMultiplier : function (self foe, move) { return 1; },
-    onDefenseMultiplier : function (self foe, move) { return 1; },
-    onSpecialAttackMultiplier : function (self foe, move) { return 1; },
-    onSpecialDefenseMultiplier : function (self foe, move) { return 1; },
-    onSpeedMultiplier : function (self foe, move) { return 1; },
-    //  When the self contacts the foe
-    onTouch : function (self, foe) { return; },
-    //  When the foe contacts the self
-    onTouched : function (self, foe) { return; },
-    //  When the self hurts the foe directly
-    onDamageDealt : function (self, foe) { return; },
-    //  When the foe hurts the self directly
-    onDamageTaken : function (self, foe) { return; },
-    //  When the self is hurt indirectly
-    onResidualDamageTaken : function (self) { return; },
-    //  When the self is hurt by recoil damage
-    onRecoilDamageTaken : function (self) { return; },
-    //  Give the item a last chance at letting the holder survive
-    onLoseLastHP : function (self) { return true; },
-    //  When the holder faints
-    onFaint : function (self, foe) { return; }
-    //  When the self loses HP to the foe; can be canceled
-    onHPDrain : function (self, foe) { return bool; },
-    //  When the self takes HP from the foe; not run from max health
-    onHPStolen : function (self, foe) { return; }
-    //  Source provided if needed; not necessarily used officially
-    //  When the mon receives a stat boost/drop
-    onStatChange : function (stat, change, source) { return; },
-    //  When the mon gets confused
-    onGetConfused : function (source) { return; },
-    //  When the mon gets a volatile status condition
-    onGetStatus : function (status, source) { return; },
-};
 
 var AbilityData = {
     extend : {
@@ -120,8 +68,11 @@ var AbilityData = {
         "Wonder Room", 8,   //  Unofficial
         "Bind" : 5,
         "Multihit" : 5
-    };
-    crit : 0;   //  stage boosts
+    },
+    //  Truant, Multitype or Stance Change.
+    nosimple : false,   //  prevent simple beaming
+    //  Trace, Truant, Multitype, Flower Gift, Imposter, Zen Mode, or Stance Change.
+    persist : false,    //  prevent overwriting the abiilty
     //  Allow abilities to change move power
     onMovePowerMultiplier : function (self, foe, move) { return 1; },
     //  Allow abilities to change stats
@@ -158,122 +109,6 @@ var AbilityData = {
 };
 
 
-//  Mons
-loadFromTemplate("name");   //  preserve teambuild
-var MonData = {
-    //  Properties about the mon right out of the Dex
-    template : {
-        name : "Missingno",
-        basestats : {
-            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0
-            "Special Attack" : 0, "Special Defense" : 0
-        }
-        types : ["Normal", "???"],
-        abilities : ["No Ability", "No Ability", "No Ability"],
-        weight : 50
-    },
-    build : {
-        nickname : "George Zip",
-        nature : "Hardy",
-        item : "No Item",
-        ability : "No Ability",
-        ivs : {
-            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
-            "Special Attack" : 0, "Special Defense" : 0
-        },
-        evs : {
-            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
-            "Special Attack" : 0, "Special Defense" : 0
-        }
-    }
-    //  Properties that stay until changed  
-    permanent : {
-        mega : false,
-        nick : "George Zip",
-        item : [object],
-        ability : [object],
-        types : [],
-        stats : {
-            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
-            "Special Attack" : 0, "Special Defense" : 0
-        },
-        status : "Healthy",
-        toxic : 0,
-        movepp : [0, 0, 0, 0],
-        eatenberry : false,
-        hyper : false,      //  Unofficial (Shadow)
-    },
-    //  Properties that are dropped when switched out
-    temporary : {
-        statboosts : {
-            "HP" : 0, "Attack" : 0, "Defense" : 0, "Speed" : 0,
-            "Special Attack" : 0, "Special Defense" : 0,
-            "Accuracy" : 0, "Evasion" : 0
-        },
-        extratype : "???",
-        protectcount : 0,
-        choicelock : false, //  Save the move
-        lastmove : "No Move",
-        attract : false,    //  Save the target
-        substitute : 0,     //  Save the HP
-        block : [],         //  Save the sources
-        grounded : false,
-        powder : false,
-        minimize : false,
-        binding : [{        //  List of bindings
-            move : "No Move",
-            turns : 0,
-            source : [object]
-        }],
-        //  2-turn moves, charge turn 1
-        flying : false,
-        bouncing : false,
-        phantom : false,
-        diving : false,
-        charging : false,
-        //  1 charge turn is all that is needed
-        countdown : {
-            confuse : 0,
-            yawn : 0,
-            magnetrise : 0,
-            telekinesis : 0,
-            taunt : 0,
-            torment : 0,
-            encore : 0,
-            recharging : 0,
-            skydropping : 0,
-            skydrop : 0,
-            embargo : 0,
-            healblock : 0
-        },
-    },
-    //  same as thisturn, loaded next turn
-    nextturn : {}
-    //  Properties that only exist this turn
-    thisturn : {
-        fairylock : source,
-        electricfy : false,
-        //  true when switched in, false when sent out naturally
-        hasmoved : true,
-        endure : false,
-        protection : {
-            protect : false,
-            spikyshield : false,
-            //  Only one 's'
-            kingshield : false
-        }
-        decision : {
-            option : "Fight" or "Switch"
-            //  if fight:
-            mega : false,
-            rotate : false, "Left" or "Right"
-            move : to move using
-            //  if switch:
-            mon : to replace it
-        }
-    }
-}
-
 
 var TeamData = {
     mega : false;   //  Team-wide property
@@ -304,6 +139,7 @@ var TeamData = {
 
 
 var FieldData = {
+    echoedvoice : 0,
     trickroom : 0,      //  Turn count
     magicroom : 0,      //  Turn count
     wonderroom : 0,     //  Turn count
