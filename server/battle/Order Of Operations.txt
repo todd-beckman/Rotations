@@ -1,0 +1,123 @@
+The following orders of operations are based on the X/Y/OR/AS versions
+and were pieced together with testing.
+
+
+1- Team Preview
+    1a- Select pokes to send out
+    1b- Initial Sendout
+        -Order mons on field by speed
+        -for all mons on field in active slots:
+            -run mon's ability onSendOut
+            -run mon's item onSendOut
+        (Note- there are inactive field slots in Rotation mode.
+        These mons do not have their onSendOut events run)
+2- Turn Selection
+    2a- Option: Fight
+        i-  Rotate legal?
+            -Rotating?
+        ii- Mega Evolve legal?
+            -Mega Evolving?
+        iii-Move Selection
+            -Limit moves as appropriate
+                -Fewer than 4 moves
+                -No PP remaining
+                -Choice Lock
+                -Taunt
+                -Torment
+                -Disable
+                -Encore
+            -Target request?
+                -Request Target
+    2b- Option: Switch
+        i-  Limit switches as appropriate
+            -Trapped?
+            -Too many fainted?
+    2c- Option: Forfeit
+3- Start of Turn
+    3a- Order mons
+        -By Speed and Priority
+            -Ability and Item onDecideTurnOrder
+                (Prankster, Custap Berry, Quick Claw)
+            -Break n-way speed ties with fair randomness
+4- Run Turn by Priority
+    +7: Pursuit
+    +6.5: Switching, Rotating
+    +6: Mega Evolution
+    +5: Helping Hand
+    +4, +3, +2, +1: Other moves
+    0: Most moves, as well as Triple Battle shifts
+    -1, -2, -3, -4, -5, -6, -7: Other moves
+    -8: Safeguard empty tier in case of priority drop
+5- End Turn
+(Events per mon take place by speed alone)
+(Events per team take place by player id (P1, P2, etc))
+(Events on field only need to run once)
+    5a- Sort mons by Speed alone
+    5b- Weather
+        i:  Weather ends
+        ii: Weather effects (damage and healing)
+    5c- Countdown Slot-targeting
+        i:  Attacks (Future Sight, Doom Desire)
+        ii: Healing (Wish)
+        iii:Field (Fire-Grass Pledge)
+    5d- Gradual Recovery
+        i:  Item (Leftovers, Black Sludge)
+        ii: Move effect onGradualRecovery:
+            -Aqua Ring
+            -Ingrain
+        iii:Move effect onGradualDrain:
+            -Leech Seed
+    5e- Gradual Status Damage
+        i:  onPoisonDamage, onBurnDamage
+        ii: Move effect onSleepDamage (Nightmare)
+        (Note: Bad Dreams comes in later)
+    5f- Traps End
+        i: Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
+    5g- Countdowns End
+        i: Move effects. These can't be generalized because they are all
+            resolved in this particular order.
+            -moveRestrictCountdown:
+                -Taunt
+                -Encore
+                -Disable/Cursed Body
+                -Torment
+            -typeEffectCountdown:
+                -Magnet Rise
+                -Telekinesis
+            -actionRestrictCountdown:
+                -Heal Block
+                -Embargo
+            -countdownToStatus:
+                -Yawn
+            -countdownToDamage:
+                -Perish Song
+            -teamCountdown:
+                -Reflect
+                -Light Screen
+                -Safeguard
+                -Mist
+                -Tailwind
+                -Lucky Chant
+                -Pledges
+            -fieldCountdown:
+                -Gravity
+                -Trick Room
+                -Wonder Room
+                -Magic Room
+            -activeMoveCountdown
+                -Uproar
+    5h- passiveEndOfTurn
+        -Ability (Speed Boost, Bad Dreams, Harvest, Moody)
+        -Move (Toxic Orb, Flame Orb, Sticky Barb)
+    5i- endOfTurnFormChange
+        -Zen Mode
+    5j- Simultaneously, both players;
+        i-  For each empty slot on field, send a mon in
+        ii- Move effect onSlotReplaced (Healing Wish, Lunar Dance)
+        iii-move effect onEntryHazard (Applied in order they were laid)
+    5k- Ability endOfTurnStatChange
+        -Slow Start
+    5j- thisturn <= nextturn; nextturn <= {}
+        -Field
+        -Teams
+        -Mons

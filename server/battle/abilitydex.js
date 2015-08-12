@@ -1,3 +1,20 @@
+/*
+Ability event list:
+
+onMultiHitCount (skill link)
+
+EOT: Nightmare, Curse, Trapping
+onResidualDamage (magic guard)
+
+EOT- End of Turn
+2.1- EOT_onWeatherDamage
+5- EOT_onStatusRestore (shed skin, healer, hydration)
+9.1- EOT_onStatusDamage (poison heal)
+14.- EOT_onPassiveEffect (speed boost, harvest, bad dreams, moody)
+16- EOT_onFormChange (zen mode)
+
+*/
+
 var Abilitydex = [
 {name:"Cacophony",desc:"Gives immunity to Sound.",inbattle:"%u is unaffected."},
 {name:"Stench",desc:"May cause flinching.",inbattle:""},
@@ -91,7 +108,11 @@ var Abilitydex = [
 {name:"Iron Fist",desc:"Boosts the power of punching moves.",inbattle:""},
 {name:"Poison Heal",desc:"Heals the user if poisoned.",inbattle:"%u is restored."},
 {name:"Adaptability",desc:"Boosts attacks of the user's type.",inbattle:""},
-{name:"Skill Link",desc:"Multi-hit attacks strike maximally.",inbattle:""},
+{name:"Skill Link",desc:"Multi-hit attacks strike maximally.",inbattle:"",
+    onMultiHitCount : function () {
+        return 5;
+    }
+},
 {name:"Hydration",desc:"Heals status afflictions in the Rain.",inbattle:"%u's Hydration cures it."},
 {name:"Solar Power",desc:"Boosts Special Attack but hurts the user in the Sun.",inbattle:"%u loses HP in the sunlight."},
 {name:"Quick Feet",desc:"Boosts Speed if the user has a status affliction.",inbattle:""},
