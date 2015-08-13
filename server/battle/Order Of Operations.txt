@@ -33,16 +33,16 @@ BEGIN LOOP
     2b- Option: Switch
         i-  Limit switches as appropriate
             for each slot in options:
-                if (user.trapped
+                if (user.trapped 
                 ||  user.team.remaining <= onfield
                 ||  trapping ability on field)
                     options.splice(slot)
-
     2c- Option: Forfeit
 3- Run Turn
     3a: Order mons
         -By Speed and Priority
             -Move, Ability, Item onDecideTurnOrder
+                (changePriority, setTopPriorityBracket)
                 (Pursuit, Prankster, Custap Berry, Quick Claw)
             -Break n-way speed ties with fair randomness
         Priority Sketch:
@@ -78,11 +78,13 @@ BEGIN LOOP
         i:  onPoisonDamage, onBurnDamage
         ii: Move effect onSleepDamage (Nightmare)
         (Note: Bad Dreams comes in later)
-    4f- Traps End
-        i: Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
+    4f- empty
     4g- Countdowns End
         i: Move effects. These can't be generalized because they are all
             resolved in this particular order.
+            -trappingCountdown:
+                -Bind, Wrap, Fire Spin, Clamp
+                -Whirlpool, Sand Tomb, Magma Storm                
             -moveRestrictCountdown:
                 -Taunt
                 -Encore
@@ -115,7 +117,7 @@ BEGIN LOOP
                 -Uproar
     4h- passiveEndOfTurn
         -Ability (Speed Boost, Bad Dreams, Harvest, Moody)
-        -Move (Toxic Orb, Flame Orb, Sticky Barb)
+        -Item (Toxic Orb, Flame Orb, Sticky Barb)
     4i- endOfTurnFormChange
         -Zen Mode
     4j- Simultaneously, both players;
@@ -209,16 +211,25 @@ damageCalc(user, move foe):
     ))
 
 useMove(user, move, targets):
+    for each stop in [flinch, sleep, freeze, infatuate, confuse, paralyze]
+    if (user.(stopper) && user.allow(stopping))
+        user.on(stop)
+        return
+
+    //  Use PP even if the move fails
+    user.pp[user.decision.slot]--;
+    (Sleep Talk, Assist, Metronome, Secret Power)
+    while move.pickNewMove
+        move = newmove
     if !move.preCondition
         return
     for (foe in targets)
+        //  Parental Bond ability
+        hitcount = move.getHitCount || ability.getHitCount || 1
         START MULTIHIT LOOP
+        DO:
         if !moveHit
             continue
-        if (move.category==status):
-            onSuccess
-        else:
-            damage = move.getExactDamage || damageCalc
 
 (Note: The following order is the tie breaker code
 and it is extremely important the order is kept.
@@ -228,17 +239,20 @@ If BOTH Pokemon faint due to the same move:
         Attacker uses a self-destruct move: Defender wins
         Attacker is hurt to recoil damage: Attacker wins
 )
-            beforeDealDamage
-                (selfdestruct, explosion, memento, destiny bond, grudge)
-            foe.onTakeDamage
-            afterDamageBeforeFaint
-                (rocky helmet, rough skin, iron barbs)
-            test user fainted (foe wincheck)
-            test foe fainted (user wincheck)
-            afterDamageFaint
-                (recoil, life orb, shell bell)
-            move.onSuccess
+        damage = move.getExactDamage || damageCalc
+        beforeDealDamage
+            (selfdestruct, explosion, memento, destiny bond)
+        foe.onTakeDamage
+        afterDamageBeforeFaint
+            (rocky helmet, rough skin, iron barbs)
         test user fainted (foe wincheck)
+        test foe fainted (user wincheck)
+        afterDamageFaint
+            (recoil, life orb, shell bell)
+        move.onSuccess
+        test user fainted (foe wincheck)
+        WHILE:
+            0 < --hitcount
         END MULTIHIT LOOP
     move.onComplete
 

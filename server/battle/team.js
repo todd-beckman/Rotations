@@ -1,31 +1,51 @@
-/*
-Team event list
-
-
-
-EOT- End of Turn
-4- EOT_onResidual DamageDamage  (fire-grass pledge)
-12- EOT_onTeamCountdown
-
-*/
-
-
 function Team (name, mons) {
     this.name = name;
     this.slots = mons;
     while (this.slots.length < 6) {
         this.slots.push(false);
     }
-    this.countdown : {
-        //reflect:{time:5,run:onCalcStats},
-        //lightscreen:{time:5,run:onCalcStats},
-        //tailwind:{time:3,run:onCalcStats},
-        //firegrasspledge:{time:5,run:EOT_onResidualDamage},
-    }
-    this.thisturn : {
-        //wideguard:allowTargetMon,
-        //quickguard:allowTargetMon,
-    }
+    this.moveeffects = [];
+    this.thisturn = {};
     //  Copied to thisturn at the end turn
-    this.nextturn : {}
+    this.nextturn = {};
+}
+Team.prototype.slotCountdown = function () {
+    //  Future Sight, Doom Desire
+    for (var i = 0; i < this.moveeffects.length; i++) {
+        var eff = this.moveeffects[i];
+        if (eff.slotCountdownAttack) {
+            if (0 == --eff.duration) {
+                eff.move.slotCountdownAttack(this, eff.slot, eff.user);
+                this.moveeffects.splice(i--, 1);
+            }
+        }
+    }
+    //  Wish
+    for (var i = 0; i < this.moveeffects.length; i++) {
+        var eff = this.moveeffects[i];
+        if (eff.slotCountdownHeal) {
+            if (0 == --eff.duration) {
+                eff.move.slotCountdownHeal(this, eff.slot, eff.user);
+                this.moveeffects.splice(i--, 1);
+            }
+        }
+    }
+    //  Fire-Grass Pledge
+    for (var i = 0; i < this.moveeffects.length; i++) {
+        var eff = this.moveeffects[i];
+        if (eff.slotGradualDamage) {
+            eff.move.slotGradualDamage(this);
+        }
+    }
+}
+Team.prototype.countdown = function() {
+    //  Reflect, Light Screen, Safeguard, Mist, Tailwind, Lucky Chant, Pledges
+    for (var i = 0; i < this.moveeffects.length; i++) {
+        var eff = this.moveeffects[i];
+        if (eff.duration) {
+            if (0 == --eff.duration) {
+                eff.move.onCountdownFinish(this);
+            }
+        }
+    }
 }
