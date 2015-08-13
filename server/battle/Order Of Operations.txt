@@ -2,15 +2,18 @@ The following orders of operations are based on the X/Y/OR/AS versions
 and were pieced together with testing.
 
 
+OVERALL STEPS:
+
 1- Team Preview
     1a- Select pokes to send out
     1b- Initial Sendout
         -Order mons on field by speed
         -for all mons on field in active slots:
-            -run mon's ability onSendOut
-            -run mon's item onSendOut
+            -mon.[ability,item].onSendOut
         (Note- there are inactive field slots in Rotation mode.
         These mons do not have their onSendOut events run)
+
+BEGIN LOOP
 2- Turn Selection
     2a- Option: Fight
         i-  Rotate legal?
@@ -19,61 +22,65 @@ and were pieced together with testing.
             -Mega Evolving?
         iii-Move Selection
             -Limit moves as appropriate
-                -Fewer than 4 moves
-                -No PP remaining
-                -Choice Lock
-                -Taunt
-                -Torment
-                -Disable
-                -Encore
+            for each slot in options:
+                if (moves[slot] is empty
+                ||  pp[slot] == 0
+                ||  moveeffect.disallowMove (Taunt, Torment, Disable, Encore)
+                ||  user.item.disallowMove (Assault Vest, Choice))
+                    options.splice(slot)
             -Target request?
                 -Request Target
     2b- Option: Switch
         i-  Limit switches as appropriate
-            -Trapped?
-            -Too many fainted?
+            for each slot in options:
+                if (user.trapped
+                ||  user.team.remaining <= onfield
+                ||  trapping ability on field)
+                    options.splice(slot)
+
     2c- Option: Forfeit
-3- Start of Turn
-    3a- Order mons
+3- Run Turn
+    3a: Order mons
         -By Speed and Priority
-            -Ability and Item onDecideTurnOrder
-                (Prankster, Custap Berry, Quick Claw)
+            -Move, Ability, Item onDecideTurnOrder
+                (Pursuit, Prankster, Custap Berry, Quick Claw)
             -Break n-way speed ties with fair randomness
-4- Run Turn by Priority
-    +7: Pursuit
-    +6.5: Switching, Rotating
-    +6: Mega Evolution
-    +5: Helping Hand
-    +4, +3, +2, +1: Other moves
-    0: Most moves, as well as Triple Battle shifts
-    -1, -2, -3, -4, -5, -6, -7: Other moves
-    -8: Safeguard empty tier in case of priority drop
-5- End Turn
+        Priority Sketch:
+            +7: Pursuit
+            +6.5: Switching, Rotating
+            +6: Mega Evolution
+            +5: Helping Hand
+            +4, +3, +2, +1: Other moves
+            0: Most moves, as well as Triple Battle shifts
+            -1, -2, -3, -4, -5, -6, -7: Other moves
+            -8: Safeguard empty tier in case of priority drop
+    3b: For each active mon, use RUN MOVE LOOP
+4- End Turn
 (Events per mon take place by speed alone)
 (Events per team take place by player id (P1, P2, etc))
 (Events on field only need to run once)
-    5a- Sort mons by Speed alone
-    5b- Weather
+    4a- Sort mons by Speed alone
+    4b- Weather
         i:  Weather ends
         ii: Weather effects (damage and healing)
-    5c- Countdown Slot-targeting
+    4c- Countdown Slot-targeting
         i:  Attacks (Future Sight, Doom Desire)
         ii: Healing (Wish)
         iii:Field (Fire-Grass Pledge)
-    5d- Gradual Recovery
+    4d- Gradual Recovery
         i:  Item (Leftovers, Black Sludge)
         ii: Move effect onGradualRecovery:
             -Aqua Ring
             -Ingrain
         iii:Move effect onGradualDrain:
             -Leech Seed
-    5e- Gradual Status Damage
+    4e- Gradual Status Damage
         i:  onPoisonDamage, onBurnDamage
         ii: Move effect onSleepDamage (Nightmare)
         (Note: Bad Dreams comes in later)
-    5f- Traps End
+    4f- Traps End
         i: Bind, Wrap, Fire Spin, Clamp, Whirlpool, Sand Tomb, Magma Storm
-    5g- Countdowns End
+    4g- Countdowns End
         i: Move effects. These can't be generalized because they are all
             resolved in this particular order.
             -moveRestrictCountdown:
@@ -106,18 +113,154 @@ and were pieced together with testing.
                 -Magic Room
             -activeMoveCountdown
                 -Uproar
-    5h- passiveEndOfTurn
+    4h- passiveEndOfTurn
         -Ability (Speed Boost, Bad Dreams, Harvest, Moody)
         -Move (Toxic Orb, Flame Orb, Sticky Barb)
-    5i- endOfTurnFormChange
+    4i- endOfTurnFormChange
         -Zen Mode
-    5j- Simultaneously, both players;
+    4j- Simultaneously, both players;
         i-  For each empty slot on field, send a mon in
         ii- Move effect onSlotReplaced (Healing Wish, Lunar Dance)
         iii-move effect onEntryHazard (Applied in order they were laid)
-    5k- Ability endOfTurnStatChange
+    4k- Ability endOfTurnStatChange
         -Slow Start
-    5j- thisturn <= nextturn; nextturn <= {}
+    4j- thisturn <= nextturn; nextturn <= {}
         -Field
         -Teams
         -Mons
+END LOOP - GO BACK TO START
+
+
+RUN ACTION (order of prereqs)
+
+moveHit(user, move, foe):
+    //  TODO: Protect and its evil twins
+    if [user,foe].ability.ignoreAccuracy
+        return true
+    if (move.ohko)
+        odds = 30 + user.level-foe.level
+        return 30 <= odds && rand < odds
+    if move.accuracy === true
+        return true
+    accuracy = user.getStat(accuracy)
+    evasion = foe.getStat(evasion)
+    return move.accuracy * accuracy * evasion
+
+getPower(user, move, foe)
+    power = move.getPower || move.power
+    power *= user.[ability,item,move].getPowerMultiplier
+    power *= foe.[ability,item,move].getPowerMultiplier
+    (Note: Item comes before move in power multiplier)
+    return power;
+
+statboost(user, move, foe):
+    stages = user.stages[stat]
+    stageratio = user.onCalculateBoostRatio
+                * foe.onCalculateBoostRatio
+    return stageratio[stages]
+
+getStat(user, move, foe, stat):
+    num = user.stats[stat]
+    num *= statboost(user, foe)
+    user.on(Stat)Modified:
+        user.team.on(Stat)Modified
+        user.[ability,item,stat].on(Stat)Modified
+        if user is burned:
+            attack *= [ability,(item),move].ignoreBorn || .5
+    num *= statboost
+    return num || 1
+
+critCheck(user, move, foe):
+    critlevel = user.stats[crit]
+    critlevel += move.crit
+    critlevel += user.[ability,item].getCriticalRatio
+    critlevel = min(critlevel, 4)
+    return rand < 1/(16>>critlevel)
+
+typeeff(user, move, foe):
+    typeeff = move.getTypeEff || typechart(type,foe)
+    typeeff *= [user,foe].ability.getTypeEff
+    return typeeff
+
+modifier(user, move, foe):
+    modifier = 1
+    if (user.hasType(move.type))
+        modifier *= 1.5
+    if (critCheck)
+        modifier *= 1.5
+    modifier *= [user,foe].[ability,item].onDamageMultiplied
+    modifier *= [user,foe].team.onDamageMultiplied  //  reflect/light screen
+    modifier *= field.onDamageMultiplied // weather, etc
+    if (mons on field > 1 && move targets more than 1) 
+        modifier -= modifier>>25    //  spread damage
+    modifier *= rand(0,.15)+.85)    //  random roll cannot be evaded
+    return modifier
+
+arithmetic(level, attack, defense, base, modifier):
+    return modifier*(level>>1+10)*attack*base/(250*defense) + 2)
+
+damageCalc(user, move foe):
+    Math.floor(arithmetic(
+        user.level,
+        user.getStat(attack),
+        foe.getStat(defense),
+        getPower,
+        modifiers
+    ))
+
+useMove(user, move, targets):
+    if !move.preCondition
+        return
+    for (foe in targets)
+        START MULTIHIT LOOP
+        if !moveHit
+            continue
+        if (move.category==status):
+            onSuccess
+        else:
+            damage = move.getExactDamage || damageCalc
+
+(Note: The following order is the tie breaker code
+and it is extremely important the order is kept.
+If BOTH Pokemon faint due to the same move:
+    If Defender causes the Attacker to faint: Defender wins
+    If Attacker causes itself to faint:
+        Attacker uses a self-destruct move: Defender wins
+        Attacker is hurt to recoil damage: Attacker wins
+)
+            beforeDealDamage
+                (selfdestruct, explosion, memento, destiny bond, grudge)
+            foe.onTakeDamage
+            afterDamageBeforeFaint
+                (rocky helmet, rough skin, iron barbs)
+            test user fainted (foe wincheck)
+            test foe fainted (user wincheck)
+            afterDamageFaint
+                (recoil, life orb, shell bell)
+            move.onSuccess
+        test user fainted (foe wincheck)
+        END MULTIHIT LOOP
+    move.onComplete
+
+getTargets(mon, move)
+    //  TODO
+
+runAction(mon, decision = {
+    action: fight, switch, or forfeit
+    mega : bool
+    rotate: false, left, or right
+    slot: move or mon to switch to
+})
+    if (action == forfeit) 
+        mon.team.opposing.win
+    if (action == switch)
+        mon.onRetreat
+        newmon = mon.team.slot[slot]
+        send out new mon
+        team.moveeffect.onEntryHazard
+        newmon.onSendOut
+        newmon.hasmoved = true
+    if (action == fight)
+        move = mon.moves[mon.decision.slot]
+        targets = getTargets(mon, move)
+        useMove(mon, targets)
