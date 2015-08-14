@@ -135,6 +135,23 @@ END LOOP - GO BACK TO START
 
 RUN ACTION (order of prereqs)
 
+statboost(user, move, foe, stat):
+    stages = user.stages[stat]
+    stageratio = user.onCalculateBoostRatio
+                * foe.onCalculateBoostRatio
+    return stageratio[stages]
+
+getStat(user, move, foe, stat):
+    num = user.stats[stat]
+    num *= statboost(user, foe, stat)
+    user.on(Stat)Modified:
+        user.team.on(Stat)Modified
+        user.[ability,item,stat].on(Stat)Modified
+        if user is burned:
+            attack *= [ability,(item),move].ignoreBorn || .5
+    num *= statboost
+    return num || 1
+
 moveHit(user, move, foe):
     //  TODO: Protect and its evil twins
     if [user,foe].ability.ignoreAccuracy
@@ -154,23 +171,6 @@ getPower(user, move, foe)
     power *= foe.[ability,item,move].getPowerMultiplier
     (Note: Item comes before move in power multiplier)
     return power;
-
-statboost(user, move, foe):
-    stages = user.stages[stat]
-    stageratio = user.onCalculateBoostRatio
-                * foe.onCalculateBoostRatio
-    return stageratio[stages]
-
-getStat(user, move, foe, stat):
-    num = user.stats[stat]
-    num *= statboost(user, foe)
-    user.on(Stat)Modified:
-        user.team.on(Stat)Modified
-        user.[ability,item,stat].on(Stat)Modified
-        if user is burned:
-            attack *= [ability,(item),move].ignoreBorn || .5
-    num *= statboost
-    return num || 1
 
 critCheck(user, move, foe):
     critlevel = user.stats[crit]

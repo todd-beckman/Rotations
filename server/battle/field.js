@@ -1,7 +1,9 @@
 
 
 var field = {
-    teams : [];
+    teams : [],
+    monsOnField : 2,    //  per team
+    activeMons : 2,     //  per team
     moveeffects : [],
     weather : {type : Weather.None, duration : }
     onWeatherCountdown : function () {
