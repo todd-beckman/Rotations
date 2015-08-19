@@ -67,6 +67,8 @@ BEGIN LOOP
         i:  Attacks (Future Sight, Doom Desire)
         ii: Healing (Wish)
         iii:Field (Fire-Grass Pledge)
+    4c.5- Status Restore
+        i: Hydration, Healer, Shed Skin
     4d- Gradual Recovery
         i:  Item (Leftovers, Black Sludge)
         ii: Move effect onGradualRecovery:

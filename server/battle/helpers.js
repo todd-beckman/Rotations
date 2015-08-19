@@ -64,14 +64,13 @@ function bindduration(user, foe) {
 }
 
 function multihit(user) {
-    var a = user.getAbility();
-    if (a.onMultiHitCount) {
-        return a.onMultiHitCount();
+    if (user.ability.onMultiHitCount) {
+        return user.ability.onMultiHitCount();
     }
     //  Unused but a potential usage
     var i = user.item;
-    if (i && i.onMultiHitCount) {
-        return i.onMultiHitCount();
+    if (user.allowItem() && user.item.onMultiHitCount) {
+        return user.item.onMultiHitCount();
     }
     switch (Math.floor(Math.random() * 6)) {
         case 0: case 1: return 2;
@@ -81,12 +80,13 @@ function multihit(user) {
     }
 }
 
-function drain (from, amount, to, ratio) {
-    var hp = from.onDrainHP(amount) * ratio;
-    if (to.item && to.item.boostDrain) {
+function drain (from, amount, to, ratio, message) {
+    var hp = from.drainHP(amount) * ratio;
+    if (to.allowItem() && to.item.boostDrain) {
         hp *= to.item.boostDrain;
     }
     if (hp != 0) {
+        return hp;
         hp < 0 ? to.onResidualDamage(hp) : to.onHeal(hp);
     }
 }

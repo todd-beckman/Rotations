@@ -1,31 +1,3 @@
-
-/*
-Move event list
-
-SI- Switch-in
-1- SI_onSwitchIn
-2- SI_onEntryEffect
-
-EOT- End of Turn
-3.1- EOT_onSlotCountdownAttack
-8.1- EOT_onDrainToSlot (leech seed)
-9.1- EOT_onGradualDamage (nightmare, curse)
-10.1- EOT_onTrappingCountdown
-11.1- EOT_onVolatileCountdown
-
-effects : {
-    flinch : 0,
-    crit : 0,
-    ohko : 0,
-    recharge : 0,
-    status : {type: percent,etc},
-    confuse : percent,
-    userboost : {stat: [stages,odds],etc}, //  used for + and -
-    foeboost : {stat: [stages,odds],etc},  //  used for + and -
-}
-
-*/
-
 var Movedex = [
     {
         name:"No Move",
@@ -71,7 +43,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Comet Punch",
@@ -83,7 +57,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1,fist:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Mega Punch",
@@ -120,7 +96,11 @@ var Movedex = [
         type:9,
         target:1,
         flags:{contact:1,protect:1,mirror:1,fist:1},
-        effects:{status:{Status.Burn:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Burn, user);
+            }
+        }
     },
     {
         name:"Ice Punch",
@@ -132,7 +112,11 @@ var Movedex = [
         type:14,
         target:1,
         flags:{contact:1,protect:1,mirror:1,fist:1},
-        effects:{status:{Status.Freeze:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Freeze, user);
+            }
+        }
     },
     {
         name:"Thunder Punch",
@@ -144,7 +128,11 @@ var Movedex = [
         type:12,
         target:1,
         flags:{contact:1,protect:1,mirror:1,fist:1},
-        effects:{status:{Status.Paralyze:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Paralyze, user);
+            }
+        }
     },
     {
         name:"Scratch",
@@ -177,8 +165,7 @@ var Movedex = [
         accuracy:30,
         type:0,
         target:1,
-        flags:{contact:1,protect:1,mirror:1},
-        effects:{ohko:1}
+        flags:{contact:1,protect:1,mirror:1,ohko:1}
     },
     {
         name:"Razor Wind",
@@ -190,11 +177,11 @@ var Movedex = [
         target:31,
         flags:{protect:1,mirror:1},
         takeChargeTurn : function (user) {
-            if (user.nocopy.chargingg) {
-                return user.nocopy.chargingg = false;
+            if (user.nocopy.charging) {
+                return user.nocopy.charging = false;
             }
             game.write(user.name() + " is stirring a whirlwind.");
-            return user.nocopy.chargingg = true;
+            return user.nocopy.charging = true;
         }
     },
     {
@@ -207,7 +194,9 @@ var Movedex = [
         type:0,
         target:0,
         flags:{snatch:1},
-        effects:{userboost:{Stat.Attack:[2]}}
+        userEffects : function (user) {
+            user.changeStat(Stat.Attack, 2);
+        }
     },
     {
         name:"Cut",
@@ -253,7 +242,9 @@ var Movedex = [
         target:1,
         flags:{magic:1,mirror:1,skipsub:1},
         priority:-6,
-        effects:{forceswitch:1}
+        onSuccess : function (user, foe) {
+            foe.forceSwitch(user);
+        }
     },
     {
         name:"Fly",
@@ -266,11 +257,11 @@ var Movedex = [
         target:1,
         flags:{contact:1,protect:1,mirror:1,gravity:1,distance:1},
         takeChargeTurn : function (user) {
-            if (user.nocopy.chargingg) {
-                return user.nocopy.flying = user.nocopy.chargingg = false;
+            if (user.nocopy.charging) {
+                return user.nocopy.flying = user.nocopy.charging = false;
             }
             game.write(user.name() + " flies up high.");
-            return user.nocopy.flying = user.nocopy.chargingg = true;
+            return user.nocopy.flying = user.nocopy.charging = true;
         }
     },
     {
@@ -352,7 +343,7 @@ var Movedex = [
         target:1,
         flags:{contact:1,protect:1,mirror:1}
     },
-    {
+    {   //  TODO
         name:"Jump Kick",
         category:1,
         pp:10,
@@ -372,7 +363,13 @@ var Movedex = [
         type:1,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        effects:{flinch:30}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 3) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Sand Attack",
@@ -384,7 +381,9 @@ var Movedex = [
         type:4,
         target:1,
         flags:{protect:1,magic:1,mirror:1},
-        effects:{foeboost:{Stat.Accuracy:[-1]}
+        foeEffects : function (user, foe) {
+            foe.changeStat(Stat.Accuracy, -1, user);
+        }
     },
     {
         name:"Headbutt",
@@ -396,8 +395,13 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        effects:{flinch:30}
-    },
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 3) {
+                foe.thisturn.flinching = true;
+            }
+        }    },
     {
         name:"Horn Attack",
         desc:"Deals damage.",
@@ -419,7 +423,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Horn Drill",
@@ -430,8 +436,7 @@ var Movedex = [
         accuracy:30,
         type:0,
         target:1,
-        flags:{contact:1,protect:1,mirror:1},
-        effects:{ohko:1}
+        flags:{contact:1,protect:1,mirror:1,ohko:1},
     },
     {
         name:"Tackle",
@@ -454,7 +459,11 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1,nonsky:1},
-        effects:{status:{Status.Paralyze,30}},
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 3) {
+                foe.getStatus(Status.Paralyze, user);
+            }
+        },
         getPower : function (user, foe) {
             return this.power * (foe.temp.minimize ? 2 : 1);
         }
@@ -504,7 +513,14 @@ var Movedex = [
         target:1,
         flags:{contact:1,protect:1,mirror:1},
         onSuccess : function (user) {
-            rampage(user, this);
+            if (user.nocopy.rampage) {
+                if (0 == --user.nocopy.rampage) {
+                    user.getConfused();
+                }
+            }
+            else {
+                user.nocopy.rampage = rand(1) + 1;
+            }
         }
     },
     {
@@ -517,7 +533,7 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        recoil:1/3}
+        recoil:1/3
     },
     {
         name:"Tail Whip",
@@ -529,7 +545,9 @@ var Movedex = [
         type:0,
         target:3,
         flags:{protect:1,magic:1,mirror:1},
-        effects:{foeboost:{Stat.Defense:[-1]}}
+        onSuccess : function (user, foe) {
+            foe.changeStat(Stat.Defense, -1, user)
+        }
     },
     {
         name:"Poison Sting",
@@ -541,7 +559,11 @@ var Movedex = [
         type:3,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Poison:30}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 3) {
+                foe.getStatus(Status.Poison, user);
+            }
+        }
     },
     {
         name:"Twineedle",
@@ -552,7 +574,11 @@ var Movedex = [
         type:6,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Poison:20}},
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 2) {
+                foe.getStatus(Status.Poison, user);
+            }
+        }
         getHitCount : function() { return 2;}
     },
     {
@@ -577,7 +603,9 @@ var Movedex = [
         type:0,
         target:3,
         flags:{protect:1,magic:1,mirror:1},
-        effects:{foeboost:{Stat.Defense:[-1]}}
+        onSuccess : function (user, foe) {
+            foe.changeStat(Stat.Defense, -1, user);
+        }
     },
     {
         name:"Bite",
@@ -589,7 +617,13 @@ var Movedex = [
         type:16,
         target:1,
         flags:{jaw:1,contact:1,protect:1,mirror:1},
-        effects:{flinch:30}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 3) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Growl",
@@ -601,7 +635,9 @@ var Movedex = [
         type:0,
         target:3,
         flags:{protect:1,magic:1,mirror:1,sound:1,skipsub:1},
-        effects:{foeboost:{Stat.Attack:[-1]}
+        onSuccess : function (user, foe) {
+            foe.changeStat(Stat.Attack, -1, user);
+        }
     },
     {
         name:"Roar",
@@ -614,7 +650,9 @@ var Movedex = [
         target:1,
         flags:{magic:1,mirror:1,sound:1,skipsub:1},
         priority:-6,
-        effects:{forceswitch:1}
+        onSuccess : function (user, foe) {
+            foe.forceSwitch(user);
+        }
     },
     {
         name:"Sing",
@@ -626,7 +664,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{protect:1,magic:1,mirror:1,sound:1,skipsub:1},
-        effects:{status{Status.Sleep,100}}
+        onSuccess : function (user, foe) {
+            foe.getStatus(Status.Sleep, user);
+        }
     },
     {
         name:"Supersonic",
@@ -638,7 +678,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{protect:1,magic:1,mirror:1,sound:1,skipsub:1},
-        effects:{confuse:100}
+        onSuccess : function (user, foe) {
+            foe.getConfused();
+        }
     },
     {
         name:"Sonic Boom",
@@ -679,7 +721,11 @@ var Movedex = [
         type:3,
         target:3,
         flags:{protect:1,mirror:1},
-        effects:{foeboost:{Stat["Special Defense"]:[-1,10]}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.changeStat(Stat["Special Defense"],-1, user);
+            }
+        }
     },
     {
         name:"Ember",
@@ -691,7 +737,11 @@ var Movedex = [
         type:9,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Burn:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Burn, user);
+            }
+        }
     },
     {
         name:"Flamethrower",
@@ -703,7 +753,11 @@ var Movedex = [
         type:9,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Burn:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Burn, user);
+            }
+        }
     },
     {
         name:"Mist",
@@ -763,7 +817,11 @@ var Movedex = [
         type:14,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Freeze:10}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Freeze, user);
+            }
+        }
     },
     {
         name:"Blizzard",
@@ -775,7 +833,11 @@ var Movedex = [
         type:14,
         target:3,
         flags:{protect:1,mirror:1},
-        effects:{status:{Status.Freeze:10}},
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getStatus(Status.Freeze, user);
+            }
+        },
         getAccuracy : function () {
             if (field.weather.type == Weather.Hail) {
                 return true;
@@ -796,7 +858,11 @@ var Movedex = [
         type:13,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{confuse:10}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.getConfused();
+            }
+        }
     },
     {
         name:"Bubble Beam",
@@ -808,7 +874,11 @@ var Movedex = [
         type:10,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{foeboost:{Stat.Speed:[-1,10]}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.changeStat(Stat.Speed, -1, user);
+            }
+        }
     },
     {
         name:"Aurora Beam",
@@ -820,7 +890,11 @@ var Movedex = [
         type:14,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{foeboost:{Stat.Attack:[-1,10]}}
+        foeEffects : function (user, foe) {
+            if (rand(10, user) < 1) {
+                foe.changeStat(Stat.Attack, -1, user);
+            }
+        }
     },
     {
         name:"Hyper Beam",
@@ -832,7 +906,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{reprotect:1,mirror:1},
-        effects:{recharge:1}
+        onSuccess : function (user) {
+            user.nextturn.recharge : true;
+        }
     },
     {
         name:"Peck",
@@ -904,7 +980,7 @@ var Movedex = [
         },
         getTarget : function (user) {
             return user.thisturn.damage.lastattacker;
-        }
+        },
         getExactDamage : function(user) {
             //  Always does 1 damage, in case of tricks like False Swipe.
             return use.thisturn.damage.physical * 2 || 1;
@@ -973,11 +1049,16 @@ var Movedex = [
             foe.gradualdrain.push({
                 move:this,
                 run:"EOT_onDrainToSlot",
-                params:[foe, user.slot]
+                params:[foe, user.team, user.slot]
             });
         }
-        EOT_onDrainToSlot : function (from, to) {
-            drain(from, from.stats[Stat.HP]/8, field.slots[to], 1);
+        EOT_onDrainToSlot : function (from, toteam, toslot) {
+            var to = toteam.slots[toslot];
+            if (to == 'empty') {
+                return false;
+            }
+            drain(from, from.stats[Stat.HP]/8, toteam.slots[toslot], 1);
+            return true;
         }
     },
     {
@@ -992,12 +1073,12 @@ var Movedex = [
         flags:{snatch:1},
         onSuccess : function (user) {
             if (field.weather.type == Weather.Sun) {
-                user.onStatChange(Stat["Attack"], 2);
-                user.onStatChange(Stat["Special Attack"], 2);
+                user.changeStat(Stat["Attack"], 2);
+                user.changeStat(Stat["Special Attack"], 2);
             }
             else {
-                user.onStatChange(Stat["Attack"], 1);
-                user.onStatChange(Stat["Special Attack"], 1);
+                user.changeStat(Stat["Attack"], 1);
+                user.changeStat(Stat["Special Attack"], 1);
             }
         }
     },
@@ -1010,8 +1091,7 @@ var Movedex = [
         accuracy:95,
         type:11,
         target:3,
-        flags:{protect:1,mirror:1},
-        effects:{crit:1}
+        flags:{protect:1,mirror:1,crit:1}
     },
     {
         name:"Solar Beam",
@@ -1119,7 +1199,7 @@ var Movedex = [
         target:1,
         flags:{protect:1,mirror:1},
         onSuccess : function (user, foe) {
-            foe.temp.trapping.push({
+            foe.trapcountdown.push({
                 move:this,
                 run:"EOT_onTrappingCountdown",
                 params:[user, foe],
@@ -1127,7 +1207,7 @@ var Movedex = [
             });
         },
         EOT_onTrappingCountdown : function (user, foe) {
-            bind(user, foe, foe.name() + " is hurt by " + user.name());
+            bind(user, foe, foe.name() + " is hurt by " + );
         }
     },
     {
@@ -1231,11 +1311,11 @@ var Movedex = [
         target:1,
         flags:{contact:1,protect:1,mirror:1,nonsky:1},
         takeChargeTurn : function (user) {
-            if (user.nocopy.chargingg) {
-                return user.nocopy.digging = user.nocopy.chargingg = false;
+            if (user.nocopy.charging) {
+                return user.nocopy.digging = user.nocopy.charging = false;
             }
             game.write(user.name() + " flies up high.");
-            return user.nocopy.digging = user.nocopy.chargingg = true;
+            return user.nocopy.digging = user.nocopy.charging = true;
         }
     },
     {
@@ -1638,8 +1718,10 @@ var Movedex = [
         target:4,
         flags:{protect:1,mirror:1},
         preCondition : function (user) {
+            return field.abilitySearch("globalAllowSelfDestruct", []);
+        },
+        beforeDamageTaken : function (user) {
             user.health = 0;
-            return true;
         }
     },
     {
@@ -1699,7 +1781,13 @@ var Movedex = [
         type:4,
         target:1,
         flags:{protect:1,mirror:1},
-        effects:{flinch:10}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 1) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Fire Blast",
@@ -1723,7 +1811,13 @@ var Movedex = [
         type:10,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        effects:{flinch:20}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 2) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Clamp",
@@ -1769,12 +1863,12 @@ var Movedex = [
         target:1,
         flags:{contact:1,protect:1,mirror:1},
         takeChargeTurn : function (user) {
-            if (user.nocopy.chargingg) {
-                return user.nocopy.chargingg = false;            
+            if (user.nocopy.charging) {
+                return user.nocopy.charging = false;            
             }
             game.write(user.name() + " is lowering its head.");
             user.onStatChange(Stat.Defense, 1);
-            return user.nocopy.chargingg = true;
+            return user.nocopy.charging = true;
         }
     },
     {
@@ -1787,7 +1881,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{protect:1,mirror:1},
-        getHitCount : multihit;
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        };
     },
     {
         name:"Constrict",
@@ -1898,7 +1994,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{bullet:1,protect:1,mirror:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Leech Life",
@@ -2061,8 +2159,10 @@ var Movedex = [
         target:4,
         flags:{protect:1,mirror:1},
         preCondition : function (user) {
+            return field.abilitySearch("globalAllowSelfDestruct", []);
+        },
+        beforeDamageTaken : function (user) {
             user.health = 0;
-            return true;
         }
     },
     {
@@ -2074,7 +2174,9 @@ var Movedex = [
         type:0,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Bonemerang",
@@ -2119,7 +2221,13 @@ var Movedex = [
         type:5,
         target:3,
         flags:{protect:1,mirror:1},
-        effects:{flinch:30}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 3) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Hyper Fang",
@@ -2131,7 +2239,13 @@ var Movedex = [
         type:0,
         target:1,
         flags:{jaw:1,contact:1,protect:1,mirror:1},
-        effects:{flinch:10}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 1) {
+                foe.thisturn.flinching = true;
+            }
+        }
     },
     {
         name:"Sharpen",
@@ -2309,7 +2423,7 @@ var Movedex = [
             game.write(foe.name() + " can't escape!");
         }
     },
-    {
+    {   //  TODO
         name:"Mind Reader",
         category:0,
         pp:5,
@@ -2343,7 +2457,8 @@ var Movedex = [
         accuracy:100,
         type:9,
         target:1,
-        flags:{contact:1,protect:1,mirror:1,"thaw":1},
+        flags:{contact:1,protect:1,mirror:1,thaw:1},
+
         effects:{status:{Status.Burn:10}}
     },
     {
@@ -2355,7 +2470,13 @@ var Movedex = [
         type:0,
         target:1,
         flags:{protect:1,mirror:1,sound:1,skipsub:1},
-        effects:{flinch:30}
+        foeEffects : function (user, foe) {
+            if (!foe.thisturn.hasmoved
+            &&  !foe.thisturn.flinching
+            &&  rand(10, user) < 3) {
+                foe.thisturn.flinching = true;
+            }
+        },
         preCondition : function (user) {
             return user.status == Status.Sleep;
         }
@@ -2607,7 +2728,22 @@ var Movedex = [
         accuracy:true,
         type:0,
         target:5,
-        flags:{sound:1,distance:1,skipsub:1}
+        flags:{sound:1,distance:1,skipsub:1},
+        onSuccess : function (user, foe) {
+            foe.countdowntodamage.push({
+                move : this,
+                duration : 4;
+            });
+        },
+        onComplete : function () {
+            game.write("All Pokemon hearing it will faint in 3 turns.")
+        },
+        onCountdown : function (user, duration) {
+            game.write(user.name() + "'s Perish Count fell to " + duration);
+        },
+        onCountdownFinish : function (user) {
+            user.health = 0;
+        }
     },
     {
         name:"Icy Wind",
@@ -2639,7 +2775,9 @@ var Movedex = [
         type:4,
         target:1,
         flags:{protect:1,mirror:1},
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Lock-On",
@@ -2871,7 +3009,7 @@ var Movedex = [
         accuracy:95,
         type:9,
         target:1,
-        flags:{protect:1,mirror:1,"thaw":1}
+        flags:{protect:1,mirror:1,thaw:1}
     },
     {
         name:"Magnitude",
@@ -3287,6 +3425,12 @@ var Movedex = [
         type:16,
         target:1,
         flags:{protect:1,mirror:1}
+        preCondition : function (user) {
+            return field.abilitySearch("globalAllowSelfDestruct", []);
+        },
+        beforeDamageTaken : function (user) {
+            user.health = 0;
+        }
     },
     {
         name:"Facade",
@@ -3593,7 +3737,9 @@ var Movedex = [
         type:1,
         target:1,
         flags:{contact:1,protect:1,mirror:1},
-        getHitCount : multihit},
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }},
     {
         name:"Camouflage",
         category:0,
@@ -4616,7 +4762,7 @@ var Movedex = [
         accuracy:100,
         type:9,
         target:1,
-        flags:{contact:1,protect:1,mirror:1,"thaw":1},
+        flags:{contact:1,protect:1,mirror:1,thaw:1},
         recoil:1/3
     },
     {
@@ -5722,7 +5868,7 @@ var Movedex = [
         accuracy:100,
         type:10,
         target:1,
-        flags:{protect:1,mirror:1,"thaw":1}
+        flags:{protect:1,mirror:1,thaw:1}
     },
     {
         name:"Shell Smash",
@@ -6277,7 +6423,7 @@ var Movedex = [
         accuracy:100,
         type:9,
         target:1,
-        flags:{protect:1,mirror:1,"thaw":1}
+        flags:{protect:1,mirror:1,thaw:1}
     },
     {
         name:"Fusion Bolt",
@@ -6623,7 +6769,7 @@ var Movedex = [
         accuracy:95,
         type:10,
         target:1,
-        flags:{protect:1,mirror:1,"thaw":1}
+        flags:{protect:1,mirror:1,thaw:1}
     },
     {
         name:"Hyperspace Hole",
@@ -6645,7 +6791,9 @@ var Movedex = [
         target:1,
         flags:{protect:1,mirror:1},
         priority:1,
-        getHitCount : multihit
+        getHitCount : function (user) {
+            return user.getMultiHitCount();
+        }
     },
     {
         name:"Mystical Fire",

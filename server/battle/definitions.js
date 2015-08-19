@@ -1,13 +1,3 @@
-var Weather = {
-    "None"          : 0,
-    "Rain"          : 1,
-    "Sun"           : 2,
-    "Sand"          : 3,
-    "Hail"          : 4
-];
-for (var i in Weather) {
-    Weather[Weather[i]] = Weather[i];
-}
 
 var Terrain = {
     "None"          : 0,
@@ -126,6 +116,30 @@ var typetable = [
     [2, 4, 2, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 4, 4, 2, 2],
     [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 ];
+//  Get the type effectiveness of the attack, 
+var typeEffectiveness = function (user, move, foe) {
+    if (!move.noeff) {
+    var typeeff = 1, types = foe.getTypes();
+    for (var i = 0; i < types.length; i++) {
+        //  Flying Press, Freeze Dry
+        if (move.typetable) {
+            typeeff *= move.typetable(move.type, types[i]);
+        }
+        //  Levitate
+        else if (foe.ability.typetable && foe.ability.usingtype(move.type)) {
+            typeeff *= foe.ability.typetable(move.type, types[i]);
+        }
+        //  Standard table
+        else {
+            typeeff *= typetable[move.type][types[i]] >> 1;
+        }
+        //  Strong Winds
+        if (field.weather.modifyTypeEffectiveness) {
+            typeeff *= field.weather.modifyTypeEffectiveness(move.type, types[i]);
+        }
+    }
+    return typeeff;
+}
 
 var Category = {
     "Status"        : 0,

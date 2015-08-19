@@ -5,7 +5,16 @@ var field = {
     monsOnField : 2,    //  per team
     activeMons : 2,     //  per team
     moveeffects : [],
-    weather : {type : Weather.None, duration : }
+    droppeditems : [],
+    weatherduration : 0,
+    trySetWeather : function (weather, user) {
+        if (this.weather.allowWeatherChange == undefined
+        ||  this.weather.allowWeatherChange(weather)) {
+            var duration = user.getWeatherDuration(weather);
+            this.weather = weather;
+            this.weatherduration = duration;
+        }
+    },
     onWeatherCountdown : function () {
         if (this.weather.type == Weather.None) {
             return;
@@ -16,6 +25,9 @@ var field = {
             switch (this.weather.type) {
                 case Weather.Rain:
                     game.write("The rain stopped.");
+                    break;
+                case Weather.HeavyRain:
+                    game.write();
                     break;
                 case Weather.Sun:
                     game.write("The sunlight faded.");
@@ -55,5 +67,21 @@ var field = {
                 }
             }
         }
+    },
+    abilitySearch : function (fun, parameters) {
+        for (var t = 0; t < teams.length; t++) {
+            for (var s = 0; s < teams[i].onfield; s++) {
+                var mon = teams[t].slots[s];
+                if (mon != 'empty') {
+                    if (mon.ability[fun]) {
+                        var r =mon.ability[fun].apply(mon.ability, parameters);
+                        if (r != 'continue') {
+                            return r;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 };
