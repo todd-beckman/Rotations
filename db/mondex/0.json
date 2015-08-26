@@ -1,0 +1,55 @@
+{
+    "id" : 0,
+    "form" : ["Bad"],
+    "name" : ["Egg"],
+    "desc" : ["Don't cheat!"],
+    "category" : ["Egg"],
+    "color" : "Gray",
+    "body" : "Round",
+    "footprint" : "None",
+    "gender" : [0, 0],
+    "types" : [0],
+    "abilities" : [0, 0, 0],
+    "height" : 3,
+    "weight" : 1590.8,
+    "expgrowth" : "Erratic",
+    "expyield" : 1,
+    "evyield" : {
+        "HP " : 0,
+        "Attack" : 0,
+        "Defense" : 0,
+        "Special Attack" : 0,
+        "Special Defense" : 0,
+        "Speed" : 0,
+    },
+    "stats" : {
+        "HP " :33,
+        "Attack" : 136,
+        "Defense" : 0,
+        "Special Attack" : 6,
+        "Special Defense" : 6,
+        "Speed" : 29,
+    },
+    "egggroups" : ["Undiscovered"],
+    "evolution" : {
+        "level" : {
+            "level" : 8,
+            "into" : 115,
+            "time" : false,
+            "item" : false,
+            "friend" : false
+        },
+        "trade" : {
+            "item" : false,
+            "into" : 115
+    },
+    "learnset" : {
+        "level" : {
+            "1" : 1
+        },
+        "teach" : [2, 3],
+        "special" : {
+            "flag" : 4
+        }
+    }
+}
