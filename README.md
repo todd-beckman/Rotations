@@ -1,7 +1,6 @@
 Rotations
 =========
 A WIP by Todd Beckman
-=====================
 
 
 
@@ -27,6 +26,7 @@ Return false to stop the event. Parameters provided are:
 - user
 - move
 - source
+
 |  Event Name | Notes | Parameters |
 |-------------|-------|------------|
 | BeforeRunAway | Wild Pokemon escape | |
@@ -46,6 +46,7 @@ Get Events
 Ability, Passive Item, Active Item, in that order, allow overriding. Return false to prevent overriding. Parameters provided are:
 - user
 - move
+
 | Event Name | Notes | Paremeters |
 |------------|-------|------------|
 | GetHitCount | 2-5 Multi-hit count | |
@@ -65,6 +66,7 @@ Active Item events are consumed if they do not return 1. Avoid returning 0 by ca
 - crit (whether this move is landing a critical hit)
 - hit (the nth hit of the multi-hit move)
 - hit2 (the nth hit of a Parental Bond user's move)
+
 | Event Name | Parameters |
 |------------|------------|
 | MultiplyPower | user, move, source, target, typeeff, crit, hit, hit2 |
@@ -96,6 +98,7 @@ Active Item events returning true consume the item. Otherwise, no return is expe
 - source
 - target
 - damage (exact points of damage dealt directly)
+
 | Event Name | Parameters |
 |------------|------------|
 | AfterFlinch | user |
@@ -112,6 +115,7 @@ End of Turn (EOT) Events
 ------------------------
 All EOT events may be canceled by returning false. Canceling an Active Item event consumes the item. Parameters provided are:
 - user
+
 | Event Name | Notes | Parameters |
 |------------|-------|------------|
 | EOT_WeatherDamage | Safety Goggles, various Abilities | user |
