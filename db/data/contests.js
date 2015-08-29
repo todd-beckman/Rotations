@@ -6,18 +6,6 @@ var ContestCondition = {
     "Tough"             : 4
 };
 
-var ContestConditionDisplay = [
-    "Condition",
-    "コンディション",
-    "Condition",
-    "Eigenschaft",
-    "Virtù",
-    "Cualidad",
-    "컨디션"
-];
-
-//  Excitement is its own condition
-
 var ContestIndifference = [
     [1, 4],
     [0, 2],
@@ -33,6 +21,8 @@ var ContestDiscontent = [
     [1, 2]
 ];
 
+
+var ContestConditionDisplay = ["Condition", "コンディション", "Condition", "Eigenschaft", "Virtù", "Cualidad", "컨디션"];
 var ContestStatDisplay = [
     ["Cool", "かっこよさ", "Sang-froid", "Coolness", "Classe", "Carisma", "근사함"],
     ["Beautiful", "うつくしさ", "Beauté", "Schönheit", "Belleza", "Belleza", "아름다움"],
@@ -40,22 +30,19 @@ var ContestStatDisplay = [
     ["Clever", "かしこさ", "Intelligence", "Klugheit", "Acume", "Ingenio", "슬기로움"],
     ["Tough", "たくましさ", "Robustesse", "Stärke", "Grinta", "Dureza", "강인함"]
 ];
-
-
-//  This will probably need translations
-var ContestColor = {"",
-    "Red",
-    "Blue",
-    "Pink",
-    "Green",
-    "Yellow"
-};
-
-//  This will probably need translations
-var ContestTaste = {"",
-    "Spicy",
-    "Sweet",
-    "Dry",
-    "Bitter",
-    "Sour"
-};
+//  TODO
+var ContestColor = [
+    ["Red"],
+    ["Blue"],
+    ["Pink"],
+    ["Green"],
+    ["Yellow"]
+];
+//  TODO
+var ContestTaste = [
+    ["Spicy"],
+    ["Sweet"],
+    ["Dry"],
+    ["Bitter"],
+    ["Sour"]
+];

@@ -1,14 +1,20 @@
-var AbilityDisplay = [
-    "Ability",
-    "とくせい",
-    "Talent",
-    "Fähigkeit",
-    "Abilità",
-    "Habilidad",
-    "특성"
+var AbilityDisplay = ["Ability", "とくせい", "Talent", "Fähigkeit", "Abilità", "Habilidad", "특성"];
+
+var ShowAbilityConnector = [
+    "'s "
 ];
 
 //  TODO: Translate the descriptions
+//  TODO: Translate the connector
+
+
+var showAbility(user, ability) {
+    //  TODO: Animation flag
+    game.write(user.name()
+        + ShowAbilityConnector[game.language]
+        + ability.name[game.language]
+    );
+}
 
 var AbilityDex = [
     {
@@ -17,39 +23,91 @@ var AbilityDex = [
     },
     {
         name:["Stench", "あくしゅう", "Puanteur", "Duftnote", "Tanfo", "Hedor", "악취"],
-        desc:["The stench may cause the target to flinch."]
+        desc:["The stench may cause the target to flinch."],
+        GetFlinchOdds : function () { return 10; }
     },
     {
         name:["Drizzle", "あめふらし", "Crachin", "Niesel", "Piovischio", "Llovizna", "잔비"],
-        desc:["The Pokémon makes it rain if it appears in battle."]
+        desc:["The Pokémon makes it rain if it appears in battle."],
+        AfterSendOut : function (user) {
+            if (weather.flag() != 1) {
+                showAbility(user, this);
+                weather.set(1);
+            }
+        }
     },
     {
         name:["Speed Boost", "かそく", "Turbo", "Temposchub", "Acceleratore", "Impulso", "가속"],
-        desc:["The Pokémon’s Speed stat is gradually boosted."]
+        desc:["The Pokémon’s Speed stat is gradually boosted."],
+        EOT_PassiveAbility : function (user) {
+            //  Does not apply speed boost for freshly switched mons
+            if (user.thisturn.hasmoved) {
+                showAbility(user, this);
+                user.statBoost([0, 0, 1]);
+            }
+        }
     },
     {
         name:["Battle Armor", "カブトアーマー", "Armurbaston", "Kampfpanzer", "Lottascudo", "Armadura Batalla*", "전투"],
-        desc:["The Pokémon is protected against critical hits."]
+        desc:["The Pokémon is protected against critical hits."],
+        BeforeFoeCriticalHit : function (user) {
+            return false;
+        }
     },
     {
         name:["Sturdy", "がんじょう　", "Fermeté", "Robustheit", "Vigore", "Robustez", "옹골참"],
-        desc:["The Pokémon is protected against 1-hit KO attacks."]
+        desc:["The Pokémon is protected against 1-hit KO attacks."],
+        BeforeLoseLastHP = function (user) {
+            if (user.health == user.stats[0]) {
+                showAbility(user, this);
+                return false;
+            }
+            return true;
+        }
     },
     {
         name:["Damp", "しめりけ", "Moiteur", "Feuchtigkeit", "Umidità", "Humedad", "습기"],
-        desc:["Prevents combatants from self destructing."]
+        desc:["Prevents combatants from self destructing."],
+        BeforeMoveUsed : function (user, move) {
+            if (move.selfko) {
+                showAbility(user, this);
+                return false;
+            }
+            return true;
+        },
+        BeforeFoeMoveUsed : function (user, move) {
+            if (move.selfko) {
+                showAbility(user, this);
+                return false;
+            }
+            return true;
+        },
     },
     {
         name:["Limber", "じゅうなん", "Échauffement", "Flexibilität", "Scioltezza", "Flexibilidad", "유연"],
-        desc:["The Pokémon is protected from paralysis."]
+        desc:["The Pokémon is protected from paralysis."],
+        BeforeParalyzed : function (user) {
+            showAbility(user, this);
+            return false;
+        }
     },
     {
         name:["Sand Veil", "すながくれ", "Voile Sable", "Sandschleier", "Sabbiavelo", "Velo Arena", "모래숨기"],
-        desc:["Boosts the Pokémon’s evasion in a sandstorm."]
+        desc:["Boosts the Pokémon’s evasion in a sandstorm."],
+        BeforeHailDamage : function () {
+            return false;
+        },
+        MultiplyEvasion : function () {
+            if (weather.flag() == 3) {
+                return 1.25;
+            }
+            return 1;
+        }
     },
     {
         name:["Static", "せいでんき", "Statik", "Statik", "Statico", "Elec. Estática*", "정전기"],
-        desc:["Contact with the Pokémon may cause paralysis."]
+        desc:["Contact with the Pokémon may cause paralysis."],
+        
     },
     {
         name:["Volt Absorb", "ちくでん", "Absorb Volt", "Voltabsorber", "Assorbivolt", "Absorbe Elec*", "축전"],

@@ -27,6 +27,8 @@ var Nature = [
     "Quirky"    : 24
 ];
 
+
+var NatureDisplay = ["Nature", "せいかく", "Nature", "Wesen", "Natura", "성격", "Naturaleza"];
 var NatureName = [
     ["Hardy", "がんばりや", "Hardi", "Robust", "Ardita", "Fuerte", "노력"],
     ["Lonely", "さみしがり", "Solo", "Solo", "Schiva", "Huraña", "외로움"],
@@ -56,15 +58,6 @@ var NatureName = [
     ["Quirky", "きまぐれ", "Bizarre", "Kauzig", "Furba", "Rara", "변덕", "Byeongdeok"]
 ];
 
-var NatureDisplay = [
-    "Nature",
-    "せいかく",
-    "Nature",
-    "Wesen",
-    "Natura",
-    "성격",
-    "Naturaleza"
-];
 
 var natureRaises = function (nature) {
     //  add 1 to skip over HP

@@ -11,10 +11,14 @@ mega : {        //  If this item allows Mega Evolution
 
 */
 
-//  TODO: Old Gateau is missing international names
-//  TODO: Fetch descriptions
 //  TODO: Fetch prices, machine moves
 
+
+//  TODO: Old Gateau is missing international names
+//  TODO: Fetch descriptions
+
+
+var HealMessage = [" restored health."];
 var ItemDex = [
 
     {
@@ -105,107 +109,244 @@ var ItemDex = [
     {
         name:["Potion", "キズぐすり", "Potion", "Trank", "Pozione", "Poción", "상처약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(20);
+        }
     },
     {
         name:["Antidote", "どくけし", "Antidote", "Gegengift", "Antidoto", "Antídoto", "해독제"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 1 || user.status == 2;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Burn Heal", "やけどなおし", "Anti-Brûle", "Feuerheiler", "Antiscottatura", "Antiquemar", "화상치료제"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 3;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Ice Heal", "こおりなおし", "Antigel", "Eisheiler", "Antigelo", "Antihielo", "얼음상태치료제"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 4;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Awakening", "ねむけざまし", "Reveil", "Aufwecker", "Sveglia", "Despertar", "잠깨는약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 5;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Paralyze Heal", "まひなおし", "Anti-Para", "Para-Heiler", "Antiparalisi", "Antiparalizador", "마비치료제"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 6;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Full Restore", "かいふくのくすり", "Guerison", "Top-Genesung", "Ricarica Totale", "Restaurar Todo", "회복약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status != 0 && user.status < 7
+                || user.health < user.stats[0];
+        },
+        use : function (user) {
+            if (user.status !=0 && user.status < 7) {
+                user.cureStatus();
+            }
+            user.restore(user.stats[0]);
+        }
     },
     {
         name:["Max Potion", "まんたんのくすり", "Potion Max", "Top-Trank", "Pozione Max", "Máxima Poción", "풀회복약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(user.stats[0]);
+        }
     },
     {
         name:["Hyper Potion", "すごいキズぐすり", "Hyper Potion", "Hypertrank", "Iperpozione", "Hiperpoción", "고급상처약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(200);
+        }
     },
     {
         name:["Super Potion", "いいキズぐすり", "Super Potion", "Supertrank", "Super Pozione", "Superpoción", "좋은상처약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(50);
+        }
     },
     {
         name:["Full Heal", "なんでもなおし", "Total Soin", "Hyperheiler", "Cura Totale", "Cura Total", "만병통치약"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status != 0 && user.status < 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Revive", "げんきのかけら", "Rappel", "Beleber", "Revitalizzante", "Revivir", "기력의조각"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+            user.restore(user.stats[0] / 2);
+        }
     },
     {
         name:["Max Revive", "げんきのかたまり", "Rappel Max", "Top-Beleber", "Revitalizzante Max", "Revivir Máximo", "기력의덩어리"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+            user.restore(user.stats[0]);
+        }
     },
     {
         name:["Fresh Water", "おいしいみず", "Eau Fraiche", "Tafelwasser", "Acqua Fresca", "Agua Fresca", "맛있는물"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(50);
+        }
     },
     {
         name:["Soda Pop", "サイコソーダ", "Soda Cool", "Sprudel", "Gazzosa", "Refresco", "미네랄사이다"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(60);
+        }
     },
     {
         name:["Lemonade", "ミックスオレ", "Limonade", "Limonade", "Lemonsucco", "Limonada", "후르츠밀크"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(80);
+        }
     },
     {
         name:["Moomoo Milk", "モーモーミルク", "Lait Meumeu", "Kuhmuh-Milch", "Latte Mumu", "Leche Mu-Mu", "튼튼밀크"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(100);
+        }
     },
     {
         name:["Energy Powder", "ちからのこな", "Poudrénergie", "Energiestaub", "Polvenergia", "Polvo Energía", "힘의가루"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(50);
+            user.modFrienship(-5);
+        }
     },
     {
         name:["Energy Root", "ちからのねっこ", "Racinénergie", "Kraftwurzel", "Radicenergia", "Raíz Energía", "힘의뿌리"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.health < user.stats[0];
+        },
+        use : function (user) {
+            user.restore(50);
+            user.modFrienship(-10);
+        }
     },
     {
         name:["Heal Powder", "ばんのうごな", "Poudre Soin", "Heilpuder", "Polvocura", "Polvo Curación", "만능가루"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status != 0 && user.status < 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+            user.modFrienship(-5);
+        }
     },
     {
         name:["Revival Herb", "ふっかつそう", "Herbe Rappel", "Vitalkraut", "Vitalerba", "Hierba Revivir", "부활 초"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status == 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+            user.restore(user.stats[0]);
+            user.modFriendship(-15);
+        }
     },
     {
         name:["Ether", "ピーピーエイド", "Huile", "Äther", "Etere", "Éter", "ＰＰ에이드"],
@@ -230,12 +371,24 @@ var ItemDex = [
     {
         name:["Lava Cookie", "フエンせんべい", "Lava Cookie", "Lavakeks", "Lavottino", "Galleta Lava", "용암전병"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        canUse : function (user) {
+            return user.status != 0 && user.status < 7;
+        },
+        use : function (user) {
+            user.cureStatus();
+        }
     },
     {
         name:["Berry Juice", "きのみジュース", "Jus De Baie", "Beerensaft", "Succo di Bacca", "Zumo de Baya", "나무열매쥬스"],
         desc:[],
-        pocket:"Medicine"
+        pocket:"Medicine",
+        held : true,
+        activeAfterTakeDamage : function (user) {
+            if (user.health <= user.stats[0] / 2) {
+                user.restore(20);
+            }
+        }
     },
     {
         name:["Sacred Ash", "せいなるはい", "Cendresacrée", "Zauberasche", "Magicenere", "Ceniza Sagrada", "성스러운분말"],

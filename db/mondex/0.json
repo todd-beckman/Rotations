@@ -9,7 +9,7 @@
     "footprint" : "None",
     "gender" : [0, 0],
     "types" : [0],
-    "abilities" : [0, 0, 0],
+    "abilities" : [0, 0, 0, 0],
     "height" : 3,
     "weight" : 1590.8,
     "expgrowth" : "Erratic",

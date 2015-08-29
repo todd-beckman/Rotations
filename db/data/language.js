@@ -8,13 +8,4 @@ var Language = {
     "한글"       : 6,
 };
 
-var LanguageName = [
-    "English",
-    "日本語",
-    "Français",
-    "Deutsch",
-    "Italiano",
-    "Español"
-    "한글",
-];
-
+var LanguageName = ["English", "日本語", "Français", "Deutsch", "Italiano", "Español" "한글",];

@@ -8,10 +8,10 @@ var Stat = {
     "Accuracy"          : 6,
     "Evasion"           : 7,
     "Critical"          : 8
-}
+};
 
+//  TODO
 var StatDisplay = [
-    //  TODO: Translate these
     ["HP"],
     ["Attack"],
     ["Defense"],
@@ -30,12 +30,12 @@ var calcStat = function (mon, stat) {
 var calcUnmodifiedStat = function (mon, stat) {
     if (stat == Stat.HP) {
         //  Shedinja
-        if (Pokedex[mon.id].stats[stat] == 1) {
+        if (Pokedex[mon.template].stats[stat] == 1) {
             return 1;
         }
         return Math.floor((
                 mon.ivs[stat]
-                + Pokedex[mon.id].stats[stat] << 1
+                + Pokedex[mon.template].stats[stat] << 1
                 + mon.evs[stat] >> 2
             ) * mon.level / 100
         ) + 10;
@@ -44,7 +44,7 @@ var calcUnmodifiedStat = function (mon, stat) {
     if (stat < 6) {
         var value = ((
                 mon.ivs[stat]
-                + Pokedex[mon.id].stats[stat] << 1
+                + Pokedex[mon.template].stats[stat] << 1
                 + mon.evs[stat] >> 2
             ) * mon.level / 100
         ) + 5;

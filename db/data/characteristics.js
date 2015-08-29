@@ -62,3 +62,4 @@ var getCharacteristic : function (mon) {
     }
     return Characteristic[maxi][max % 5];
 }
+
