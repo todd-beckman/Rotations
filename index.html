@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Page</title>
-        <link rel="stylesheet" type="text/css" href="css/style.css">
-        <link rel="stylesheet" type="text/css" href="share/bootstrap.min.css">
+        <title>Home - Rotations</title>
         <script type="text/javascript" src="js/lib.js"></script>
+        <script type="text/javascript">
+INCLUDESTYLES([
+    "css/style.css",
+    "css/home.css",
+    "share/bootstrap.min.css"
+]);
+        </script>
     </head>
     <body>
         <div id="wrapper" class="container-fluid">
@@ -21,15 +26,27 @@
                     <img class="logo" src="img/pokeball.png">
                 </div>
             </div></a>
-            <div class="row-fluid">
-                <div class="col-xs-12 col-sm-3">
-                    <p>left side</p>
-                </div>
-                <div class="col-xs-12 col-sm-6">
-                    <p>middle stuff goes here</p>
-                </div>
-                <div class="col-xs-12 col-sm-3">
-                    <p>left side</p>
+            <div class="row">
+                <a href="pokedex/">
+                <div class="dexlink col-xs-12 col-sm-6 col-md-3">
+                    <p>Pokedex</p>
+                </div></a>
+                <a href="movedex/">
+                <div class="dexlink col-xs-12 col-sm-6 col-md-3">
+                    <p>Movedex</p>
+                </div></a>
+                <a href="abilitydex/">
+                <div class="dexlink col-xs-12 col-sm-6 col-md-3">
+                    <p>Abilitydex</p>
+                </div></a>
+                <a href="itemdex">
+                <div class="dexlink col-xs-12 col-sm-6 col-md-3">
+                    <p>Itemdex</p>
+                </div></a>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <p class="text-center">A site by Todd Beckman</p>
                 </div>
             </div>
         </div>

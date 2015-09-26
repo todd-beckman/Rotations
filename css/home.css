@@ -1,0 +1,21 @@
+.dexlink >p{
+    background-color: #222;
+    border-radius: 10px;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: auto;
+}
+.dexlink {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #333;
+    -webkit-transition: background-color 0.20s;
+    transition: background-color 0.20s;
+}
+.dexlink:hover {
+    background-color: #444;
+    -webkit-transition: background-color 0.20s;
+    transition: background-color 0.20s;
+}
