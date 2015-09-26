@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pokedex - Rotations</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="../js/lib.js"></script>
+        <script type="text/javascript">
+INCLUDESTYLES([
+    "../css/style.css",
+    "../css/pokedex.css",
+    "../share/bootstrap.min.css"
+]);
+INCLUDESCRIPTS([
+    "../js/pokedex.js"
+]);
+        </script>
+    </head>
+    <body>
+        <div id="wrapper" class="container-fluid">
+            <a href="../index.html">
+            <div id="header" class="row text-center">
+                <div class="col-xs-3">
+                    <img class="logo" src="../img/pokeball.png">
+                </div>
+                <div class="col-xs-6">
+                    <h1>Rotations</h1>
+                    <p class="text-italic">by Todd Beckman</p>
+                </div>
+                <div class="col-xs-3">
+                    <img class="logo" src="../img/pokeball.png">
+                </div>
+            </div></a>
+            <div class="row">
+                <div class="col-xs-12">
+                    <form action="">
+<input type="text" name="mon" title="mon" style="color:#888;" value="Pokemon Name or ID" onfocus="INPUTFOCUS(this)" onblur="INPUTBLUR(this)" />
+<input type="submit" value="Search">
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1 id="monname" class="text-center"></h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <a href="https://github.com/todd-beckman/Rotations"><p class="text-center">Source Here.</p></a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
