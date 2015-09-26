@@ -1,4 +1,30 @@
 @import url(https://fonts.googleapis.com/css?family=Slabo+27px);
-body{
+html,body{
+    background-color: #000;
+}
+#wrapper{
+    color: white;
     font-family: 'Slabo 27px', serif;
+    background-color: #222;
+}
+#header{
+    background-color: #444;
+}
+.logo{
+    width: 50px;
+    height: 50px;
+    margin: auto;
+}
+.text-italic{
+    font-style: italic;
+}
+p {
+    font-size: 14pt;
+}
+p.lead {
+    font-size: 18pt;
+}
+a:link, a:hover, a:visited, a:active {
+    text-decoration: none !important;
+    color: inherit !important;
 }
