@@ -1,11 +1,12 @@
-#monpic, #monshiny {
-    padding: 20px;
-    background-color: #333;
-    border-radius: 10px;
-    border-top: #333 2px solid;
-    border-left: #333 2px solid;
-    border-bottom: #111 2px solid;
-    border-right: #111 2px solid;
+td:nth-child(odd){
+    text-align: right;
+    width: 45%;
+    padding-right: 5%;
+}
+td:nth-child(even){
+    text-align: left;
+    width: 45%;
+    padding-left: 5%;
 }
 input{
     text-align: center;
