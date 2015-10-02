@@ -12,7 +12,9 @@ INCLUDESTYLES([
     "../share/bootstrap.min.css"
 ]);
 INCLUDESCRIPTS([
-    "../js/pokedex.js"
+    "../js/poke/names.js",
+    "../js/poke/templates.js",
+    "../js/poke/run.js"
 ]);
         </script>
     </head>
@@ -40,10 +42,61 @@ INCLUDESCRIPTS([
                 </div>
             </div>
             <div class="row">
-                <div id="monpic" class="col-xs-6 col-sm-2 text-center"></div>
-                <div id="monshiny" class="col-xs-6 col-sm-2 text-center"></div>
-                <div class="col-xs-12 col-sm-4">
-                    <h1 id="monname" class="text-center"></h1>
+                <div id="monpic" class="col-xs-12 col-sm-3 text-center"></div>
+                <div class="col-xs-12 col-sm-9">
+                    <h1 id="monname" class="text-center hr"></h1>
+<div class="col-xs-12 col-sm-6 tb">
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Typing:</p></div>
+        <div class="col-xs-6 col-md-4"><p id="montypes"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Gender:</p></div>
+        <div class="col-xs-6 col-md-4"><p id="mongender"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Height (m):</p></div>
+        <div class="col-xs-6 col-md-4"><p id="monheight"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Weight (kg):</p></div>
+        <div class="col-xs-6 col-md-4"><p id="monweight"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Color:</p></div>
+        <div class="col-xs-6 col-md-4"><p id="moncolor"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-4"><p>Egg Groups:</p></div>
+        <div class="col-xs-6 col-md-4"><p id="moneggs"></p></div>
+    </div>
+</div>
+<div class="col-xs-12 col-sm-6 tb">
+    <div class="row">
+        <div class="col-xs-8"><p>HP</p></div>
+        <div class="col-xs-4"><p id="monhp"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8"><p>Attack</p></div>
+        <div class="col-xs-4"><p id="monatk"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8"><p>Defense</p></div>
+        <div class="col-xs-4"><p id="mondef"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8"><p>Special Attack</p></div>
+        <div class="col-xs-4"><p id="monspa"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8"><p>Special Defense</p></div>
+        <div class="col-xs-4"><p id="monspd"></p></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8"><p>Speed</p></div>
+        <div class="col-xs-4"><p id="monspe"></p></div>
+    </div>
+</div>
                 </div>
             </div>
             <div class="row">
