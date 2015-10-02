@@ -10,7 +10,7 @@ if(get['mon']!==undefined){
     }
     if (id===-1){
         window.location.href=window.location.href.split("?")[0];
-    }       
+    }
 }
 window.onload=function(){
     if (id===-1) {
