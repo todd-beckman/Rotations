@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 3,
+"lower": 3,
+"name":{
+ "English": "Serious",
+ "日本語": "まじめ",
+ "Français": "Sérieux",
+ "Deutsch": "Ernst",
+ "Italiano": "Seria",
+ "한글": "성실",
+ "Español": "Seria"
+}
+}

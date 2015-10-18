@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 5,
+"lower": 5,
+"name":{
+ "English": "Quirky",
+ "日本語": "きまぐれ",
+ "Français": "Bizarre",
+ "Deutsch": "Kauzig",
+ "Italiano": "Furba",
+ "한글": "변덕",
+ "Español": "Rara"
+}
+}

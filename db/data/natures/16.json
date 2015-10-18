@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 4,
+"lower": 2,
+"name":{
+ "English": "Mild",
+ "日本語": "おっとり",
+ "Français": "Doux",
+ "Deutsch": "Mild",
+ "Italiano": "Mite",
+ "한글": "의젓",
+ "Español": "Afable"
+}
+}

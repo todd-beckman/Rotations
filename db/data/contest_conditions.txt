@@ -1,0 +1,5 @@
+Cool,かっこよさ,Sang-froid,Coolness,Classe,Carisma,근사함
+Beautiful,うつくしさ,Beauté,Schönheit,Belleza,Belleza,아름다움
+Cute,かわいさ,Grâce,Putzigkeit,Grazia,Dulzura,귀여움
+Clever,かしこさ,Intelligence,Klugheit,Acume,Ingenio,슬기로움
+Tough,たくましさ,Robustesse,Stärke,Grinta,Dureza,강인함

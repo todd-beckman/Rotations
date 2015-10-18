@@ -1,0 +1,49 @@
+{
+"version":1,
+"Healthy":{
+ "names": ["Healthy"],
+ "inflicted": [""],
+},
+"Poison":{
+ "names": ["Poison"],
+ "inflicted": ["%p was poisoned"],
+ "effect": ["%p is hurt by poison."],
+ "cured": ["%p was cured of its poison!"]
+},
+"Bad Poison":{
+ "names": ["Bad Poison"],
+ "inflicted": ["%p was badly poisoned"],
+ "effect": ["%p is hurt badly by poison."],
+ "cured": ["%p was cured of its poison!"]
+},
+"Burn":{
+ "names": ["Burn"],
+ "inflicted": ["%p was burned"],
+ "effect": ["%p is hurt by its burn."],
+ "cured": ["%p's burn was healed!"]
+},
+"Freeze":{
+ "names": ["Freeze"],
+ "inflicted": ["%p was frozen solid"],
+ "effect": ["%p is frozen solid."],
+ "cured": ["%p thawed out!"]
+},
+"Sleep":{
+ "names": ["Sleep"],
+ "inflicted": ["%p fell asleep."],
+ "effect": ["%p is fast asleep."],
+ "cured": ["%p woke up!"]
+},
+"Paralysis":{
+ "names": ["Paralysis"],
+ "inflicted": ["%p was paralyzed."],
+ "effect": ["%p is fully paralyzed."],
+ "cured": ["%p was cured of paralysis!"]
+},
+"Fainted":{
+ "names": ["Fainted"],
+ "inflicted": ["%p fainted!"],
+ "effect": ["%p is unable to fight."],
+ "cured": ["%p recovered from fainting!"]
+}
+}

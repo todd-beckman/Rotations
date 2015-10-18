@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 5,
+"lower": 4,
+"name":{
+ "English": "Careful",
+ "日本語": "しんちょう",
+ "Français": "Prudent",
+ "Deutsch": "Sacht",
+ "Italiano": "Cauta",
+ "한글": "신중",
+ "Español": "Cauta"
+}
+}

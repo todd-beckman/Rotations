@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 3,
+"lower": 5,
+"name":{
+ "English": "Naive",
+ "日本語": "むじゃき",
+ "Français": "Naïf",
+ "Deutsch": "Naiv",
+ "Italiano": "Ingenua",
+ "한글": "천진난만",
+ "Español": "Ingenua"
+}
+}

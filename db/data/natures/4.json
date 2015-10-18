@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 1,
+"lower": 5,
+"name":{
+ "English": "Naughty",
+ "日本語": "やんちゃ",
+ "Français": "Mauvais",
+ "Deutsch": "Frech",
+ "Italiano": "Birbona",
+ "한글": "개구쟁이",
+ "Español": "Pícara"
+}
+}

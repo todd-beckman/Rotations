@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 5,
+"lower": 1,
+"name":{
+ "English": "Calm",
+ "日本語": "おだやか",
+ "Français": "Calme",
+ "Deutsch": "Still",
+ "Italiano": "Calma",
+ "한글": "차분",
+ "Español": "Serena"
+}
+}

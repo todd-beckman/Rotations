@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 4,
+"lower": 4,
+"name":{
+ "English": "Bashful",
+ "日本語": "てれや",
+ "Français": "Pudique",
+ "Deutsch": "Zaghaft",
+ "Italiano": "Ritrosa",
+ "한글": "수줍음",
+ "Español": "Tímida"
+}
+}

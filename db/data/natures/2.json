@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 1,
+"lower": 3,
+"name":{
+ "English": "Brave",
+ "日本語": "ゆうかん",
+ "Français": "Brave",
+ "Deutsch": "Mutig",
+ "Italiano": "Audace",
+ "한글": "용감",
+ "Español": "Audaz"
+}
+}

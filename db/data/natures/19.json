@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 4,
+"lower": 5,
+"name":{
+ "English": "Rash",
+ "日本語": "うっかりや",
+ "Français": "Foufou",
+ "Deutsch": "Hitzig",
+ "Italiano": "Ardente",
+ "한글": "덜렁",
+ "Español": "Alocada"
+}
+}

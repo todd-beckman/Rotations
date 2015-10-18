@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 5,
+"lower": 3,
+"name":{
+ "English": "Sassy",
+ "日本語": "なまいき",
+ "Français": "Malpoli",
+ "Deutsch": "Forsch",
+ "Italiano": "Vivace",
+ "한글": "건방",
+ "Español": "Grosera"
+}
+}

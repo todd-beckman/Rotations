@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 2,
+"lower": 1,
+"name":{
+ "English": "Bold",
+ "日本語": "ずぶとい",
+ "Français": "Assuré",
+ "Deutsch": "Kühn",
+ "Italiano": "Sicura",
+ "한글": "대담",
+ "Español": "Osada",
+}
+}

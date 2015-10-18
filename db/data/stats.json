@@ -1,0 +1,14 @@
+{
+"version":1,
+"stat":[
+ "HP",
+ "Attack",
+ "Defense",
+ "Speed",
+ "Special Attack",
+ "Special Defense",
+ "Accuracy",
+ "Evasion",
+ "Critical"
+]
+}

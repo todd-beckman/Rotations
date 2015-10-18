@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 2,
+"lower": 5,
+"name":{
+ "English": "Lax",
+ "日本語": "のうてんき",
+ "Français": "Lâche",
+ "Deutsch": "Lasch",
+ "Italiano": "Fiacca",
+ "한글": "촐랑",
+ "Español": "Floja"
+}
+}

@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 5,
+"lower": 2,
+"name":{
+ "English": "Gentle",
+ "日本語": "おとなしい",
+ "Français": "Gentil",
+ "Deutsch": "Zart",
+ "Italiano": "Gentile",
+ "한글": "얌전",
+ "Español": "Amable"
+}
+}

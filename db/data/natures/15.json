@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 4,
+"lower": 1,
+"name":{
+ "English": "Modest",
+ "日本語": "ひかえめ",
+ "Français": "Modeste",
+ "Deutsch": "Mäßig",
+ "Italiano": "Modesta",
+ "한글": "조심",
+ "Español": "Modesta"
+}
+}

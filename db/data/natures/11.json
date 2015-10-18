@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 3,
+"lower": 2,
+"name":{
+ "English": "Hasty",
+ "日本語": "せいかく",
+ "Français": "Pressé",
+ "Deutsch": "Hastig",
+ "Italiano": "Lesta",
+ "한글": "성급",
+ "Español": "Activa"
+}
+}

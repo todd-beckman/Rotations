@@ -1,0 +1,14 @@
+{
+"version":1,
+"raise": 3,
+"lower": 4,
+"name":{
+ "English": "Jolly",
+ "日本語": "ようき",
+ "Français": "Jovial",
+ "Deutsch": "Froh",
+ "Italiano": "Allegra",
+ "한글": "명랑",
+ "Español": "Alegre"
+}
+}
